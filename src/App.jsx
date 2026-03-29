@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 // Layout Components
@@ -11,8 +11,19 @@ import CreateOrg from './pages/CreateOrg';
 import Admin from './pages/Admin';
 import Upload from './pages/Upload';
 import SignIn from './pages/SignIn';
+import SplashPage from './pages/SplashPage';
 
 const App = () => {
+  // Handle Booting sequence for SplashPage
+  const [isBooting, setIsBooting] = useState(true);
+
+  useEffect(() => {
+    // Auth0 session
+    const timer = setTimeout(() => setIsBooting(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isBooting) return <SplashPage/>
   return (
     <Router>
       <div className="bg-sky-50 min-h-screen selection:bg-sky-200">
