@@ -1,176 +1,97 @@
-import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Lock, ArrowUpCircle, CheckCircle, Cpu, Fingerprint, RefreshCcw } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShieldCheck, Lock, ArrowUpCircle, Info, CheckCircle } from 'lucide-react';
+import { submitSecret } from '../utilites/netUtilities';
 
 const Upload = () => {
   const [formData, setFormData] = useState({ name: '', category: 'General', value: '' });
   const [status, setStatus] = useState('idle'); // idle | encrypting | uploading | success
-  const [scramble, setScramble] = useState("");
-
-  // Fun visual: Scramble text effect to simulate encryption
-  useEffect(() => {
-    if (status === 'encrypting') {
-      const chars = "ABCDEF0123456789!@#$%^&*";
-      const interval = setInterval(() => {
-        setScramble(Array(15).fill(0).map(() => chars[Math.floor(Math.random() * chars.length)]).join(""));
-      }, 80);
-      return () => clearInterval(interval);
-    }
-  }, [status]);
-
-  const handleSecureUpload = async (e) => {
-    e.preventDefault();
-    setStatus('encrypting');
-
-    try {
-      // Mocking the Web Crypto API / RSA-4096 logic
-      setTimeout(() => {
-        setStatus('uploading');
-        setTimeout(() => setStatus('success'), 2000);
-      }, 2500);
-    } catch (err) {
-      console.error("Encryption failed", err);
-      setStatus('idle');
-    }
-  };
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-800 font-[Poppins] pt-12 pb-12 px-6 relative z-10">
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-[Poppins] pt-24 pb-12 px-6">
       <div className="max-w-2xl mx-auto">
         
-        {/* --- HEADER --- */}
+        {/* Header */}
         <div className="mb-10 text-center">
-          <div className="inline-flex p-4 rounded-[2rem] bg-white border border-sky-100 text-sky-600 mb-6 shadow-xl shadow-sky-200/50 group hover:rotate-12 transition-transform duration-500">
+          <div className="inline-flex p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 mb-4">
             <Lock size={32} />
           </div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tighter">
-            Deposit New <span className="text-sky-500">Secret</span>
-          </h1>
-          <p className="text-slate-500 mt-2 text-sm font-medium italic">
-            Zero-knowledge architecture. Local encryption only.
-          </p>
+          <h1 className="text-3xl font-bold text-white">Deposit New Secret</h1>
+          <p className="text-slate-400 mt-2">Data is encrypted locally before leaving your device.</p>
         </div>
 
-        {/* --- UPLOAD FORM --- */}
-        <div className="relative group">
-          {/* Decorative aura behind form */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-sky-400 to-cyan-400 rounded-[2.5rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+        {/* Upload Form */}
+        <form onSubmit={submitSecret} className="bg-slate-900/40 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-2xl space-y-6">
           
-          <form 
-            onSubmit={handleSecureUpload} 
-            className="relative bg-white/80 border border-sky-100 rounded-[2.5rem] p-10 backdrop-blur-2xl shadow-2xl shadow-sky-200/40 space-y-7"
+          {/* Status Overlay */}
+          {status !== 'idle' && (
+            <div className="absolute inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-3xl transition-all">
+              {status === 'encrypting' && (
+                <>
+                  <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4" />
+                  <p className="font-bold text-white tracking-widest uppercase text-xs">Performing RSA Encryption...</p>
+                </>
+              )}
+              {status === 'uploading' && (
+                <>
+                  <ArrowUpCircle size={48} className="text-blue-500 animate-bounce mb-4" />
+                  <p className="font-bold text-white tracking-widest uppercase text-xs">Transmitting Ciphertext...</p>
+                </>
+              )}
+              {status === 'success' && (
+                <div className="text-center animate-in zoom-in-95">
+                  <CheckCircle size={64} className="text-emerald-500 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-white">Upload Secured</h3>
+                  <button onClick={() => setStatus('idle')} className="mt-6 text-purple-400 text-sm font-bold uppercase hover:underline">Deposit Another</button>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div>
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Secret Identifier</label>
+            <input 
+              required
+              type="text" 
+              placeholder="e.g. Production Database Password" 
+              className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500/50 outline-none transition-all"
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Category</label>
+            <select className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500/50 outline-none transition-all appearance-none">
+              <option>Infrastructure</option>
+              <option>Finance</option>
+              <option>Internal Keys</option>
+              <option>General</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Secret Value</label>
+            <textarea 
+              required
+              rows="4"
+              placeholder="Paste sensitive data here..." 
+              className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500/50 outline-none transition-all resize-none"
+              onChange={(e) => setFormData({...formData, value: e.target.value})}
+            />
+            <div className="mt-3 flex items-start gap-2 text-slate-500 bg-white/5 p-3 rounded-lg">
+              <ShieldCheck size={16} className="shrink-0 text-emerald-500" />
+              <p className="text-[10px] leading-relaxed italic">
+                Your input is handled by the **Web Crypto API**. Plaintext never touches our servers.
+              </p>
+            </div>
+          </div>
+
+          <button 
+            type="submit"
+            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-xl font-bold shadow-xl shadow-purple-900/20 hover:opacity-90 transition-all active:scale-95 flex items-center justify-center gap-2"
           >
-            
-            {/* --- STATUS OVERLAY --- */}
-            {status !== 'idle' && (
-              <div className="absolute inset-0 z-50 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center rounded-[2.5rem] transition-all animate-in fade-in duration-300">
-                {status === 'encrypting' && (
-                  <div className="text-center">
-                    <div className="relative w-20 h-20 mb-6 mx-auto">
-                        <div className="absolute inset-0 border-4 border-sky-100 rounded-full" />
-                        <div className="absolute inset-0 border-4 border-sky-600 border-t-transparent rounded-full animate-spin" />
-                        <Cpu className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sky-600" size={28} />
-                    </div>
-                    <p className="font-black text-slate-900 tracking-widest uppercase text-xs mb-2">RSA-4096 Wrapping</p>
-                    <p className="font-mono text-sky-500 text-lg font-bold">{scramble}</p>
-                  </div>
-                )}
-                
-                {status === 'uploading' && (
-                  <div className="text-center">
-                    <ArrowUpCircle size={64} className="text-sky-600 animate-bounce mb-4 mx-auto" />
-                    <p className="font-black text-slate-900 tracking-widest uppercase text-xs">Transmitting Ciphertext...</p>
-                  </div>
-                )}
-
-                {status === 'success' && (
-                  <div className="text-center animate-in zoom-in-95 duration-500">
-                    <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-emerald-100">
-                        <CheckCircle size={40} className="text-emerald-500" />
-                    </div>
-                    <h3 className="text-2xl font-black text-slate-900 tracking-tighter">Vault Secured</h3>
-                    <p className="text-slate-500 text-sm mt-1">Secret added to your encrypted registry.</p>
-                    <button 
-                        onClick={() => setStatus('idle')} 
-                        className="mt-8 flex items-center gap-2 mx-auto bg-slate-900 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-sky-600 transition-all active:scale-95"
-                    >
-                        <RefreshCcw size={14} /> Deposit Another
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* --- INPUT FIELDS --- */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label className="block text-[10px] font-black text-sky-900/40 uppercase mb-2 ml-1 tracking-[0.2em]">Secret Identifier</label>
-                    <input 
-                        required
-                        type="text" 
-                        placeholder="e.g. AWS Production Key" 
-                        className="w-full bg-slate-50 border border-sky-100 rounded-2xl px-5 py-4 text-slate-900 focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 outline-none transition-all placeholder:text-slate-300"
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-[10px] font-black text-sky-900/40 uppercase mb-2 ml-1 tracking-[0.2em]">Access Category</label>
-                    <div className="relative">
-                        <select className="w-full bg-slate-50 border border-sky-100 rounded-2xl px-5 py-4 text-slate-900 focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 outline-none transition-all appearance-none cursor-pointer">
-                            <option>Infrastructure</option>
-                            <option>Finance</option>
-                            <option>Internal Keys</option>
-                            <option>General</option>
-                        </select>
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-sky-400">▼</div>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <label className="block text-[10px] font-black text-sky-900/40 uppercase mb-2 ml-1 tracking-[0.2em]">Sensitive Payload</label>
-                <textarea 
-                    required
-                    rows="5"
-                    placeholder="Paste your private key, password, or secret blob here..." 
-                    className="w-full bg-slate-50 border border-sky-100 rounded-3xl px-6 py-5 text-slate-900 font-mono text-sm focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 outline-none transition-all resize-none placeholder:text-slate-300"
-                    onChange={(e) => setFormData({...formData, value: e.target.value})}
-                />
-                
-                {/* Security Info Box */}
-                <div className="mt-5 flex items-start gap-4 text-sky-800 bg-sky-50/50 border border-sky-100 p-5 rounded-2xl">
-                    <div className="p-2 bg-white rounded-lg shadow-sm">
-                        <Fingerprint size={18} className="text-sky-600" />
-                    </div>
-                    <p className="text-[11px] leading-relaxed font-medium">
-                        Your input is processed via <span className="font-black text-sky-700">AES-256-GCM</span> within a secure window.crypto context. No unencrypted data is ever transmitted or stored on our infrastructure.
-                    </p>
-                </div>
-            </div>
-
-            {/* Submit Button */}
-            <button 
-                type="submit"
-                className="w-full bg-gradient-to-r from-sky-600 to-cyan-500 text-white py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-sky-200 hover:shadow-sky-300 transition-all active:scale-95 flex items-center justify-center gap-3 group"
-            >
-                <ShieldCheck size={20} className="group-hover:rotate-12 transition-transform" /> 
-                Securely Upload to Vault
-            </button>
-          </form>
-        </div>
-
-        {/* --- BOTTOM SECURITY BADGES --- */}
-        <div className="mt-12 flex flex-wrap justify-center gap-8 opacity-30 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700">
-             <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-slate-500">
-                <ShieldCheck size={14} /> FIPS 140-2 Compliant
-             </div>
-             <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-slate-500">
-                <Lock size={14} /> Zero Knowledge
-             </div>
-             <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-slate-500">
-                <Cpu size={14} /> Client-Side Only
-             </div>
-        </div>
+            <Lock size={18} /> Securely Upload to Vault
+          </button>
+        </form>
       </div>
     </div>
   );

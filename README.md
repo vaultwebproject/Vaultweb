@@ -34,3 +34,4 @@ npm run dev
 ├── pages/          # Hero, MyVault, Admin, Upload, Sign-in
 ├── hooks/          # useAuth, useEncryption, useVault
 └── App.jsx         # Routing & Global Providers
+
