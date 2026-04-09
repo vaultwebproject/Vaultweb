@@ -3,11 +3,14 @@ import axios from 'axios';
 import { encryptData, decryptData } from './cryptoUtilities';
 import {sha1,sha256,sha384,sha512} from 'crypto-hash';
 
-export const submitAccount = async(email, role, organisation) => {
+export const submitAccount = async(email, role, password, organisation) => {
     const submission = new FormData();
+
+    const passHash = await sha256(password);
 
     submission.append("email", email);
     submission.append("role", role);
+    submission.append("passHash", passHash);
     submission.append("organisation", organisation);
 
     try{
@@ -34,12 +37,13 @@ export const submitLogin = async(email, password) => {
     }
 }
 
-export const submitSecret = async (key, data, userID, name, iv) => {
+export const submitSecret = async (key, data, userID, vaultID, name, iv) => {
     var submissionData = "";
     submissionData, iv = encryptData(data, key);
 
     const submission = new FormData();
     submission.append("userID", userID);
+    submission.append("vaultID", vaultID);
     submission.append("name", name);
     submission.append("submissionData", submissionData);
     submission.append("iv", iv);
