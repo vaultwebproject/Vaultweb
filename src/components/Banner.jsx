@@ -3,90 +3,71 @@ import { ShieldCheck, ChevronRight, Lock, Terminal } from "lucide-react";
 
 const Banner = () => {
   return (
-    // relative and z-10 ensure it floats cleanly on top of the App.jsx background glows.
-    // min-h-[90vh] gives a hero feel while allowing the footer to be visible.
-    <div className="relative min-h-[90vh] flex items-center justify-center overflow-hidden font-[Poppins] bg-transparent pt-12 pb-16">
-      
-      {/* 1. SECTION-SPECIFIC AMBIENCE (Soft Sky Glows) */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-        {/* Central bright sky-200/50 flare */}
-        <div className="w-[700px] h-[500px] bg-sky-200/50 blur-[130px] rounded-full opacity-60" />
-      </div>
+    <div className="relative min-h-screen bg-slate-950 flex items-center justify-center overflow-hidden font-[Poppins]">
+      {/* 1. Background Glow Effects */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-purple-600/20 blur-[120px] rounded-full opacity-50" />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-blue-600/10 blur-[100px] rounded-full opacity-30" />
 
       {/* 2. Main Content Wrapper */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center animate-in fade-in-up duration-1000">
-        
-        {/* Security Badge - Transitioned to Sky-100 base */}
-        <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-sky-100/70 border border-sky-200 text-sky-700 text-xs font-black tracking-wider uppercase mb-8 shadow-sm shadow-sky-200/30">
-          <ShieldCheck size={15} className="text-sky-600" />
+      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+        {/* Security Badge */}
+        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-purple-400 text-xs font-bold tracking-widest uppercase mb-8 animate-fade-in">
+          <ShieldCheck size={14} />
           <span>Military Grade Client-Side Encryption</span>
         </div>
 
-        {/* Headline - Transitioned to Slate-900 (Navy) with Sky Gradient */}
-        <h1 className="text-5xl md:text-7xl font-extrabold text-slate-950 mb-6 tracking-tight leading-[1.05] animate-fade-in-down duration-1000">
+        {/* Headline */}
+        <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight leading-tight">
           Your Data. <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 via-sky-500 to-cyan-500 animate-gradient-slow bg-[size:200%]">
+          <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
             Your Keys.
           </span>{" "}
           Your Privacy.
         </h1>
 
-        {/* Sub-headline - Transitions to Slate-600/700 for better light mode contrast */}
-        <p className="max-w-2xl mx-auto text-slate-600 text-lg md:text-xl mb-12 leading-relaxed">
-          VaultWeb leverages the modern{" "}
-          <span className="text-slate-900 font-semibold bg-sky-100 px-1 rounded">Web Crypto API</span> to
-          ensure that all encryption happens exclusively in your browser. Not even
-          we can access what you store.
+        {/* Sub-headline */}
+        <p className="max-w-2xl mx-auto text-slate-400 text-lg md:text-xl mb-10 leading-relaxed">
+          VaultWeb uses the{" "}
+          <span className="text-white font-medium">Web Crypto API</span> to
+          ensure that encryption happens exclusively in your browser. Not even
+          we can see what you store.
         </p>
 
-        {/* CTAs - Light Blue Theme Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
-          {/* Primary CTA: Solid Sky Blue with Shadow */}
-          <button className="group relative w-full sm:w-auto px-10 py-4 bg-sky-600 text-white rounded-full font-bold transition-all hover:scale-105 hover:bg-sky-700 active:scale-95 shadow-xl shadow-sky-200 hover:shadow-sky-300">
+        {/* CTAs */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <button className="group relative px-8 py-4 bg-white text-black rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
             <span className="flex items-center gap-2">
               Get Started Free{" "}
               <ChevronRight
                 size={18}
-                className="group-hover:translate-x-1.5 transition-transform"
+                className="group-hover:translate-x-1 transition-transform"
               />
             </span>
           </button>
 
-          {/* Secondary CTA: Translucent Sky with Sky Text */}
-          <button className="w-full sm:w-auto px-10 py-4 bg-white/70 text-sky-700 border border-sky-200 rounded-full font-bold hover:bg-sky-100/70 transition-all backdrop-blur-sm shadow-sm hover:shadow-lg hover:shadow-sky-100">
+          <button className="px-8 py-4 bg-white/5 text-white border border-white/10 rounded-full font-bold hover:bg-white/10 transition-all backdrop-blur-md">
             View Documentation
           </button>
         </div>
 
-        {/* Tech Proof Footer - Swapped colors for light mode visibility */}
-        <div className="mt-24 pt-12 border-t border-sky-100 flex flex-wrap justify-center gap-10 opacity-70 hover:opacity-100 transition-all duration-700">
-          <div className="flex items-center gap-2.5 text-xs md:text-sm font-mono text-slate-700 tracking-wider">
-            <div className="w-10 h-10 rounded-xl bg-sky-100 border border-sky-200 flex items-center justify-center">
-              <Lock size={18} className="text-sky-600" /> 
-            </div>
-            <span>AES-256-GCM</span>
+        {/* Tech Proof Footer */}
+        <div className="mt-20 flex flex-wrap justify-center gap-8 opacity-60 hover:opacity-100 transition-all duration-700">
+          <div className="flex items-center gap-2 text-sm font-mono text-white tracking-widest">
+            <Lock size={16} className="text-purple-400" /> AES-256-GCM
           </div>
-          
-          <div className="flex items-center gap-2.5 text-xs md:text-sm font-mono text-slate-700 tracking-wider">
-            <div className="w-10 h-10 rounded-xl bg-cyan-100 border border-cyan-200 flex items-center justify-center">
-              <Terminal size={18} className="text-cyan-600" /> 
-            </div>
-            <span>RSA-4096</span>
+          <div className="flex items-center gap-2 text-sm font-mono text-white tracking-widest">
+            <Terminal size={16} className="text-blue-400" /> RSA-4096
           </div>
-
-          <div className="flex items-center gap-2.5 text-xs md:text-sm font-mono text-slate-700 tracking-wider">
-            <div className="w-10 h-10 rounded-xl bg-sky-100 border border-sky-200 flex items-center justify-center">
-              <ShieldCheck size={18} className="text-sky-600" /> 
-            </div>
-            <span>Argon2ID</span>
+          <div className="flex items-center gap-2 text-sm font-mono text-white tracking-widest">
+            <ShieldCheck size={16} className="text-indigo-400" /> Argon2ID
           </div>
         </div>
       </div>
 
-      {/* 3. Decorative Overlays - Replaced 'noise' with ' blueprint lines' for clean tech feel */}
-      <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(to_right,#0ea5e9_1px,transparent_1px),linear-gradient(to_bottom,#0ea5e9_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none" />
+      {/* 3. Decorative Grid Overlay */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
     </div>
   );
 };
-
 export default Banner;
