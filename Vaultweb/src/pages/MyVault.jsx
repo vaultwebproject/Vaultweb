@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Lock, Eye, EyeOff, Search, Plus, Trash2, Copy } from "lucide-react";
 import { decryptData } from "../utilites/cryptoUtilities";
-import { retrieveData } from "../utilites/netUtilities";
 
 const MyVault = () => {
   const [searchTerm, setSearchTerm] = useState("");

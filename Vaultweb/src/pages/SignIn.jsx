@@ -9,14 +9,12 @@ const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState("");
 
-  const handleSignIn = (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
-    // Logic: Trigger Auth0 Login or Custom Auth
     console.log("Initiating secure session for:", email);
-    result = submitLogin(email, password);
-    if (result.confirm == true){
-      userData = retriveUserInfo(result.id);
-      
+    const result = await submitLogin(email, password);
+    if (result?.confirm === true) {
+      const userData = await retriveUserInfo(result.id);
     }
   };
 
