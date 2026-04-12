@@ -58,7 +58,7 @@ export const submitSecret = async (key, data, userID, vaultID, name, iv) => {
 }
 
 export const retriveUserInfo = async (userID) => {
-    const data = ""
+    var data = ""
     axios.get("backendendpoint.com/${userID}").then(res => {
         data = res.data
     }).catch(err => {
@@ -69,7 +69,7 @@ export const retriveUserInfo = async (userID) => {
 }
 
 export const retriveUserSecrets = async (userID) => {
-    const data = ""
+    var data = ""
     axios.get("backendendpoint.com/data/${userID}").then(res => {
         data = res.data
     }).catch(err => {
@@ -80,7 +80,7 @@ export const retriveUserSecrets = async (userID) => {
 }
 
 export const retriveSecretByVault = async (vaultID) => {
-    const data = ""
+    var data = ""
     axios.get("backendendpoint.com/data/${vaultID}").then(res => {
         data = res.data
     }).catch(err => {

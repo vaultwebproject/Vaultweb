@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { createMasterKey } from '../utilites/cryptoUtilities';
 import { submitLogin, retriveUserInfo } from '../utilites/netUtilities';
 import { useContext } from 'react';
+import { UserContext } from '../UserContext';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -102,6 +103,12 @@ const SignIn = () => {
         <p className="text-center mt-8 text-slate-500 text-sm">
           Don't have an organization? {' '}
           <Link to="/create-org" className="text-purple-400 font-bold hover:text-purple-300 transition-colors">
+            Create One Now
+          </Link>
+        </p>
+        <p className="text-center mt-8 text-slate-500 text-sm">
+          Don't have an account? {' '}
+          <Link to="/signup" className="text-purple-400 font-bold hover:text-purple-300 transition-colors">
             Create One Now
           </Link>
         </p>
