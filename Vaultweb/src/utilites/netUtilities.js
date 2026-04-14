@@ -15,7 +15,7 @@ export const submitAccount = async(email, role, password, organisation) => {
 
     try{
         //Insert backend address here
-        const result = await axios.post("backendendpoint.com/createAccount", submission);
+        const result = await axios.post("http://localhost:3000/createAccount", submission);
         return result;
     } catch (err) {
         console.error("Post failed");
@@ -23,14 +23,9 @@ export const submitAccount = async(email, role, password, organisation) => {
 }
 
 export const submitLogin = async(email, password) => {
-    const submission = new FormData();
     const passHash = await sha256(password);
-
-    submission.append("email", email);
-    submission.append("passHash", passHash);
     try{
-        //Insert backend address here
-        const result = await axios.post("backendendpoint.com/login", submission);
+        const result = await axios.post("http://localhost:3000/auth/login", { email, passHash }); // Routes are defined in VaultWeb_Project_B\vault-api\src\index.ts. Then created in routes/auth/PostLogin.ts
         return result.data;
     } catch (err) {
         console.error("Post failed");
@@ -50,7 +45,7 @@ export const submitSecret = async (key, data, userID, vaultID, name, iv) => {
 
     try{
         //Insert backend address here
-        const result = await axios.post("backendendpoint.com/data/submit", submission);
+        const result = await axios.post("http://localhost:3000/data/submit", submission);
         return result;
     } catch (err) {
         console.error("Post failed");
@@ -58,35 +53,17 @@ export const submitSecret = async (key, data, userID, vaultID, name, iv) => {
 }
 
 export const retriveUserInfo = async (userID) => {
-    var data = ""
-    axios.get("backendendpoint.com/${userID}").then(res => {
-        data = res.data
-    }).catch(err => {
-        console.error("Get failed");
-    });
-
-    return data;
+    const res = await axios.get(`http://localhost:3000/users/${userID}`);
+    return res.data;
 }
 
 export const retriveUserSecrets = async (userID) => {
-    var data = ""
-    axios.get("backendendpoint.com/data/${userID}").then(res => {
-        data = res.data
-    }).catch(err => {
-        console.error("Get failed");
-    });
-
-    return data;
+    const res = await axios.get(`http://localhost:3000/data/${userID}`);
+    return res.data;
 }
 
 export const retriveSecretByVault = async (vaultID) => {
-    var data = ""
-    axios.get("backendendpoint.com/data/${vaultID}").then(res => {
-        data = res.data
-    }).catch(err => {
-        console.error("Get failed");
-    });
-
-    return data;
+    const res = await axios.get(`http://localhost:3000/data/${vaultID}`);
+    return res.data;
 }
 

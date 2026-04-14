@@ -11,17 +11,12 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const userInfo = useContext(UserProvider);
 
-  const handleSignIn = (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
-    // Logic: Trigger Auth0 Login or Custom Auth
     console.log("Initiating secure session for:", email);
-    result = submitLogin(email, password);
-    if (result.confirm == true){
-      userData = retriveUserInfo(result.id);
-      userInfo.setUserName(userData.userName);
-      userInfo.setuuID(result.id);
-      key = createMasterKey(password, email);
-      userInfo.setUserKey(key);
+    const result = await submitLogin(email, password);
+    if (result?.confirm === true) {
+      const userData = await retriveUserInfo(result.id);
     }
   };
 
