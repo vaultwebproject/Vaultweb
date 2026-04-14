@@ -4,11 +4,12 @@ import { Link } from 'react-router-dom';
 import { createMasterKey } from '../utilites/cryptoUtilities';
 import { submitLogin, retriveUserInfo } from '../utilites/netUtilities';
 import { useContext } from 'react';
-import { UserContext } from '../UserContext';
+import UserProvider from "../UserContext";
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState("");
+  const userInfo = useContext(UserProvider);
 
   const handleSignIn = (e) => {
     e.preventDefault();
@@ -17,7 +18,10 @@ const SignIn = () => {
     result = submitLogin(email, password);
     if (result.confirm == true){
       userData = retriveUserInfo(result.id);
-      
+      userInfo.setUserName(userData.userName);
+      userInfo.setuuID(result.id);
+      key = createMasterKey(password, email);
+      userInfo.setUserKey(key);
     }
   };
 

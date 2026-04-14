@@ -13,6 +13,7 @@ const MyVault = () => {
   useEffect(() => {
     async () => {
       const result = retriveUserSecrets(userInfo.uuID);
+      setVaultItems(result);
     }
   }, []);
 
