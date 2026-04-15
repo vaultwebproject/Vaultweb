@@ -1,7 +1,7 @@
 import { serve } from "@hono/node-server";
 import { Hono, type Context } from "hono";
 import { cors } from "hono/cors";
-import { PrismaClient } from "./generated/prisma/client.js";
+import { PrismaClient } from "./generated/client.js";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { fromHono } from "chanfana";
 import { GetVaultById } from "./routes/vault/GetVaultById.js";
