@@ -62,6 +62,7 @@ const MyVault = () => {
           </div>
         </div>
 
+        {/* aubciuece */}
         {/* Vault Table Card */}
         <div className="bg-slate-900/40 border border-white/5 rounded-3xl backdrop-blur-xl overflow-hidden shadow-2xl">
           <table className="w-full text-left">
