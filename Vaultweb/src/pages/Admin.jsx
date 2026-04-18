@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
-import { Users, Activity, ShieldCheck, UserPlus, MoreVertical, Search, FileText, Download, Shield } from 'lucide-react';
+import { 
+  Users, Activity, ShieldCheck, UserPlus, MoreVertical, 
+  Search, FileText, Download, Shield, Building2 
+} from 'lucide-react';
+// Assuming Organization.jsx is in the same folder or imported correctly
+import Organization from './Organisation'; 
 
 const Admin = () => {
+  // 1. Updated default state to 'users'
   const [activeTab, setActiveTab] = useState('users');
 
   // Mock Data
@@ -29,44 +35,49 @@ const Admin = () => {
               Enterprise Administration
             </div>
             <h1 className="text-4xl font-black text-slate-900 tracking-tighter flex items-center gap-3">
-              Organization <span className="text-sky-500">Admin</span>
+              Admin <span className="text-sky-500">Portal</span>
             </h1>
-            <p className="text-slate-500 mt-2 text-sm">Monitor security compliance and manage infrastructure access.</p>
+            <p className="text-slate-500 mt-2 text-sm">Manage your workspace identity, team, and security logs.</p>
           </div>
           
           <button className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-7 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-sky-200 active:scale-95 group">
-            <UserPlus size={18} className="group-hover:scale-110 transition-transform" /> Add Member
+            <UserPlus size={18} /> Add Member
           </button>
         </div>
 
-        {/* --- TAB NAVIGATION --- */}
-        <div className="flex gap-10 border-b border-sky-100 mb-10">
-          <button 
-            onClick={() => setActiveTab('users')}
-            className={`pb-5 text-[11px] font-black tracking-[0.2em] uppercase transition-all relative ${
-                activeTab === 'users' 
-                ? 'text-sky-600 border-b-2 border-sky-600' 
-                : 'text-slate-400 hover:text-sky-400'
-            }`}
-          >
-            Team Management
-          </button>
-          <button 
-            onClick={() => setActiveTab('logs')}
-            className={`pb-5 text-[11px] font-black tracking-[0.2em] uppercase transition-all relative ${
-                activeTab === 'logs' 
-                ? 'text-sky-600 border-b-2 border-sky-600' 
-                : 'text-slate-400 hover:text-sky-400'
-            }`}
-          >
-            Security Audit
-          </button>
+        {/* --- TAB NAVIGATION (Updated with Organization) --- */}
+        <div className="flex gap-10 border-b border-sky-100 mb-10 overflow-x-auto">
+          {[
+            { id: 'users', label: 'Team Management', icon: Users },
+            { id: 'organization', label: 'Organisation Management', icon: Building2 },
+            { id: 'logs', label: 'Security Audit', icon: Activity },
+          ].map((tab) => (
+            <button 
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`pb-5 text-[11px] font-black tracking-[0.2em] uppercase transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activeTab === tab.id 
+                  ? 'text-sky-600 border-b-2 border-sky-600' 
+                  : 'text-slate-400 hover:text-sky-400'
+              }`}
+            >
+              <tab.icon size={14} /> {tab.label}
+            </button>
+          ))}
         </div>
 
-        {/* --- CONTENT AREA (Card) --- */}
+        {/* --- CONTENT AREA --- */}
         <div className="bg-white/80 border border-sky-100 rounded-[2.5rem] backdrop-blur-xl overflow-hidden shadow-2xl shadow-sky-200/30">
           
-          {activeTab === 'users' ? (
+          {/* Organization View */}
+          {activeTab === 'organization' && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <Organization />
+            </div>
+          )}
+
+          {/* Team Management View */}
+          {activeTab === 'users' && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
@@ -86,16 +97,12 @@ const Admin = () => {
                           <div className="text-[10px] text-sky-600/60 font-black uppercase tracking-widest">{user.email}</div>
                         </td>
                         <td className="px-10 py-7">
-                          <span className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-tighter border ${
-                              user.role === 'Organiser' 
-                              ? 'bg-sky-50 border-sky-200 text-sky-600' 
-                              : 'bg-slate-50 border-slate-100 text-slate-400'
-                          }`}>
+                          <span className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-tighter border ${user.role === 'Organiser' ? 'bg-sky-50 border-sky-200 text-sky-600' : 'bg-slate-50 border-slate-100 text-slate-400'}`}>
                             {user.role}
                           </span>
                         </td>
-                        <td className="px-10 py-7">
-                          <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
+                        <td className="px-10 py-7 text-xs font-bold text-slate-600">
+                          <div className="flex items-center gap-2">
                             <div className={`w-2 h-2 rounded-full ${user.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}`} />
                             {user.status}
                           </div>
@@ -111,9 +118,11 @@ const Admin = () => {
                 </table>
               </div>
             </div>
-          ) : (
+          )}
+
+          {/* Audit Logs View */}
+          {activeTab === 'logs' && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {/* Audit Header */}
               <div className="p-8 border-b border-sky-100 flex justify-between items-center bg-sky-50/30">
                 <div className="text-[10px] font-black text-sky-700/60 uppercase tracking-[0.3em] flex items-center gap-3">
                   <Activity size={16} className="text-sky-500" /> Real-Time Access Logs
@@ -122,8 +131,6 @@ const Admin = () => {
                   <Download size={14} /> Export CSV
                 </button>
               </div>
-
-              {/* Log List */}
               <div className="divide-y divide-sky-50">
                 {logs.map((log) => (
                   <div key={log.id} className="px-10 py-6 flex items-center justify-between hover:bg-sky-50/30 transition-colors group">
@@ -133,16 +140,12 @@ const Admin = () => {
                       </div>
                       <div>
                         <div className="text-sm font-black text-slate-900">{log.action}</div>
-                        <div className="text-xs text-slate-500 mt-0.5">
-                          Executed by <span className="text-sky-600 font-bold">{log.user}</span> 
-                          <span className="mx-2 text-slate-300">•</span> 
-                          Target: <span className="font-mono text-slate-600 bg-slate-100 px-1 rounded">{log.target}</span>
+                        <div className="text-xs text-slate-500">
+                          By <span className="text-sky-600 font-bold">{log.user}</span> • Target: <span className="font-mono text-slate-600 bg-slate-100 px-1 rounded">{log.target}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-full">
-                      {log.time}
-                    </div>
+                    <div className="text-[10px] font-black text-slate-400 tracking-widest uppercase bg-slate-50 px-3 py-1 rounded-full">{log.time}</div>
                   </div>
                 ))}
               </div>
@@ -150,23 +153,23 @@ const Admin = () => {
           )}
         </div>
 
-        {/* --- STATS OVERVIEW (Bottom Row) --- */}
+        {/* --- STATS OVERVIEW --- */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <div className="bg-white/60 border border-sky-100 p-6 rounded-3xl flex items-center justify-between">
+            <div className="bg-white/60 border border-sky-100 p-6 rounded-3xl flex items-center justify-between shadow-sm">
                 <div>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Members</p>
                     <p className="text-2xl font-black text-slate-900">12 / 15</p>
                 </div>
                 <Users className="text-sky-200" size={32} />
             </div>
-            <div className="bg-white/60 border border-sky-100 p-6 rounded-3xl flex items-center justify-between">
+            <div className="bg-white/60 border border-sky-100 p-6 rounded-3xl flex items-center justify-between shadow-sm">
                 <div>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Storage Used</p>
                     <p className="text-2xl font-black text-slate-900">420 MB</p>
                 </div>
                 <ShieldCheck className="text-sky-200" size={32} />
             </div>
-            <div className="bg-white/60 border border-sky-100 p-6 rounded-3xl flex items-center justify-between">
+            <div className="bg-white/60 border border-sky-100 p-6 rounded-3xl flex items-center justify-between shadow-sm">
                 <div>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Uptime Index</p>
                     <p className="text-2xl font-black text-emerald-500">99.9%</p>

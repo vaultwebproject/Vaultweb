@@ -11,7 +11,6 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 w-full h-20 z-[100] bg-white/70 backdrop-blur-xl border-b border-sky-100/50 font-[Poppins] transition-all">
       <div className="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
-        
         {/* 1. LOGO SECTION */}
         <Link to="/" className="flex items-center space-x-3 group z-[110]">
           <div className="relative">
@@ -48,8 +47,8 @@ const Navbar = () => {
 
         {/* 3. RIGHT SIDE: Actions */}
         <div className="flex items-center space-x-6 z-[110]">
-          <Link 
-            to="/signin" 
+          <Link
+            to="/signin"
             className="hidden md:block text-[11px] font-black text-slate-500 hover:text-sky-600 uppercase tracking-widest transition-colors"
           >
             Sign In
@@ -64,7 +63,6 @@ const Navbar = () => {
 
         </div>
       </div>
-
     </nav>
   );
 };
