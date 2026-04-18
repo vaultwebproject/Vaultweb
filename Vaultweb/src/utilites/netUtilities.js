@@ -1,69 +1,95 @@
-import React from 'react';
 import axios from 'axios';
-import { encryptData, decryptData } from './cryptoUtilities';
-import {sha1,sha256,sha384,sha512} from 'crypto-hash';
+import { encryptData } from './cryptoUtilities';
+import { sha256 } from 'crypto-hash';
 
-export const submitAccount = async(email, role, password, organisation) => {
-    const submission = new FormData();
+const API_BASE = "http://localhost:3000";
 
-    const passHash = await sha256(password);
+/**
+ * Registers a new account and provisions an organization.
+ * Updated to send JSON to match Amy's PostAccount receiver.
+ */
+export const submitAccount = async (email, role, password, organisationName) => {
+    const passwordHash = await sha256(password);
 
-    submission.append("email", email);
-    submission.append("role", role);
-    submission.append("passHash", passHash);
-    submission.append("organisation", organisation);
-
-    try{
-        //Insert backend address here
-        const result = await axios.post("http://localhost:3000/createAccount", submission);
-        return result;
-    } catch (err) {
-        console.error("Post failed");
-    }
-}
-
-export const submitLogin = async(email, password) => {
-    const passHash = await sha256(password);
-    try{
-        const result = await axios.post("http://localhost:3000/auth/login", { email, passHash }); // Routes are defined in VaultWeb_Project_B\vault-api\src\index.ts. Then created in routes/auth/PostLogin.ts
+    try {
+        const result = await axios.post(`${API_BASE}/createAccount`, {
+            email,
+            role,
+            passwordHash,
+            organisationName // Matches schema in PostAccount.ts
+        });
         return result.data;
     } catch (err) {
-        console.error("Post failed");
+        console.error("Account creation failed:", err.response?.data || err.message);
+        throw err;
     }
 }
 
-export const submitSecret = async (key, data, userID, vaultID, name, iv) => {
-    var submissionData = "";
-    submissionData, iv = encryptData(data, key);
-
-    const submission = new FormData();
-    submission.append("userID", userID);
-    submission.append("vaultID", vaultID);
-    submission.append("name", name);
-    submission.append("submissionData", submissionData);
-    submission.append("iv", iv);
-
-    try{
-        //Insert backend address here
-        const result = await axios.post("http://localhost:3000/data/submit", submission);
-        return result;
+/**
+ * Authenticates user and returns session/org data.
+ */
+export const submitLogin = async (email, password) => {
+    const passwordHash = await sha256(password);
+    try {
+        const result = await axios.post(`${API_BASE}/auth/login`, { 
+            email, 
+            passwordHash 
+        });
+        return result.data;
     } catch (err) {
-        console.error("Post failed");
+        console.error("Login failed:", err.response?.data || err.message);
+        throw err;
     }
 }
 
-export const retriveUserInfo = async (userID) => {
-    const res = await axios.get(`http://localhost:3000/users/${userID}`);
+/**
+ * Encrypts and submits a secret to the vault.
+ * Fixed: Encryption variable assignment and switched to JSON payload.
+ */
+export const submitSecret = async (key, data, userID, vaultID, name) => {
+    // Correctly destructure the encrypted payload and IV from your utility
+    const { encryptedData, iv } = encryptData(data, key);
+
+    try {
+        const result = await axios.post(`${API_BASE}/data/submit`, {
+            userID,
+            vaultID,
+            name,
+            submissionData: encryptedData,
+            iv: iv // Sent as string to be handled by Amy's JSON.stringify logic
+        });
+        return result.data;
+    } catch (err) {
+        console.error("Secret submission failed:", err.response?.data || err.message);
+        throw err;
+    }
+}
+
+/**
+ * Retrieves specific user metadata and role.
+ */
+export const retrieveUserInfo = async (userID) => {
+    try {
+        const res = await axios.get(`${API_BASE}/users/${userID}`);
+        return { confirm: true, ...res.data };
+    } catch (err) {
+        console.error("User retrieval failed:", err);
+        return { confirm: false };
+    }
+}
+
+/**
+ * Retrieves all secrets owned by a specific user.
+ */
+export const retrieveUserSecrets = async (userID) => {
+    const res = await axios.get(`${API_BASE}/data/${userID}`);
     return res.data;
 }
 
-export const retriveUserSecrets = async (userID) => {
-    const res = await axios.get(`http://localhost:3000/data/${userID}`);
+/**
+ * Retrieves secrets associated with a specific vault/department.
+ */
+export const retrieveSecretByVault = async (vaultID) => {
+    const res = await axios.get(`${API_BASE}/data/vault/${vaultID}`);
     return res.data;
 }
-
-export const retriveSecretByVault = async (vaultID) => {
-    const res = await axios.get(`http://localhost:3000/data/${vaultID}`);
-    return res.data;
-}
-
