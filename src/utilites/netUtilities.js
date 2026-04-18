@@ -54,7 +54,7 @@ export const submitSecret = async (key, data, userID, name, iv) => {
 }
 
 export const retriveUserInfo = async (userID) => {
-    const data = ""
+    let data = ""
     axios.get("backendendpoint.com/${userID}").then(res => {
         data = res.data
     }).catch(err => {
@@ -65,7 +65,7 @@ export const retriveUserInfo = async (userID) => {
 }
 
 export const retriveUserSecrets = async (userID) => {
-    const data = ""
+    let data = ""
     axios.get("backendendpoint.com/data/${userID}").then(res => {
         data = res.data
     }).catch(err => {
@@ -76,7 +76,7 @@ export const retriveUserSecrets = async (userID) => {
 }
 
 export const retriveSecretByVault = async (vaultID) => {
-    const data = ""
+    let data = ""
     axios.get("backendendpoint.com/data/${vaultID}").then(res => {
         data = res.data
     }).catch(err => {
@@ -84,5 +84,26 @@ export const retriveSecretByVault = async (vaultID) => {
     });
 
     return data;
+}
+
+export const submitAuditLog = async (logEntry) => {
+    const submission = new FormData();
+    submission.append("id",        logEntry.id);
+    submission.append("timestamp", logEntry.timestamp);
+    submission.append("action",    logEntry.action);
+    submission.append("severity",  logEntry.severity);
+    submission.append("userId",    logEntry.userId);
+    submission.append("userName",  logEntry.userName);
+    submission.append("target",    logEntry.target);
+    submission.append("details",   logEntry.details);
+    submission.append("prevHash",  logEntry.prevHash);
+    submission.append("hash",      logEntry.hash);
+
+    try {
+        const result = await axios.post("backendendpoint.com/audit/log", submission);
+        return result;
+    } catch (err) {
+        console.error("Audit log submission failed");
+    }
 }
 
