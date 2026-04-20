@@ -1,35 +1,23 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Lock, Eye, EyeOff, Search, Plus, Trash2, Copy } from "lucide-react";
 import { decryptData } from "../utilites/cryptoUtilities";
+import { retriveSecretByVault, retriveUserSecrets } from "../utilites/netUtilities";
+import UserProvider from "../UserContext";
 
 const MyVault = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [decryptedId, setDecryptedId] = useState(null);
+  const userInfo = useContext(UserProvider);
+  const [vaultItems, setVaultItems] = useState([]);
+
+  useEffect(() => {
+    async () => {
+      const result = retriveUserSecrets(userInfo.uuID);
+      setVaultItems(result);
+    }
+  }, []);
 
   // Mock Data: In reality, 'value' would be an Encrypted Blob from your DB
-  const vaultItems = [
-    {
-      id: 1,
-      name: "Database Production",
-      category: "Infrastructure",
-      value: "db_prod_9921_xX",
-      date: "2024-05-10",
-    },
-    {
-      id: 2,
-      name: "Stripe API Key",
-      category: "Finance",
-      value: "sk_live_51Mh...",
-      date: "2024-05-12",
-    },
-    {
-      id: 3,
-      name: "Admin Panel Password",
-      category: "Internal",
-      value: "Admin!@#2024",
-      date: "2024-05-15",
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-[Poppins] pt-24 pb-12 px-6">

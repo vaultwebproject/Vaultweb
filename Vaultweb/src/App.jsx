@@ -13,6 +13,7 @@ import CreateOrg from './pages/CreateOrg';
 import Admin from './pages/Admin';
 import Upload from './pages/Upload';
 import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
 
 const App = () => {
   return (
@@ -32,6 +33,7 @@ const App = () => {
             <Route path="/admin" element={<Admin />} />
             <Route path="/upload" element={<Upload />} />
             <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp></SignUp>}></Route>
             
             {/* Fallback for 404 */}
             <Route path="*" element={
