@@ -10,14 +10,38 @@ const MyVault = () => {
   const userInfo = useContext(UserProvider);
   const [vaultItems, setVaultItems] = useState([]);
 
+  function arrayBufferToBase64(buffer) {
+    const bytes = new Uint8Array(buffer);
+    return btoa(String.fromCharCode(...bytes));
+  }
+
+  function base64ToArrayBuffer(base64) {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes.buffer;
+  }
+
+  async function retrieveFromVault() {
+    const result = await retriveSecretByVault(vaultID);
+    const decrypted = [];
+    for (const item of result) {
+      const cipherBuffer = base64ToArrayBuffer(item.submissionData);
+      const itemIV = atob(item.iv);
+      const plainText = await decryptData(cipherBuffer, userInfo.userKey, itemIV);
+      decrypted.push({ ...item, submissionData: plainText });
+    }
+    console.log(decrypted);
+    setVaultItems(decrypted);
+  }
+
   useEffect(() => {
     async () => {
-      const result = retriveUserSecrets(userInfo.uuID);
-      setVaultItems(result);
+      retrieveFromVault();
     }
   }, []);
-
-  // Mock Data: In reality, 'value' would be an Encrypted Blob from your DB
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-[Poppins] pt-24 pb-12 px-6">
@@ -88,47 +112,18 @@ const MyVault = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
-                      <span className="px-3 py-1 bg-slate-800 rounded-full text-[10px] font-black text-slate-400 uppercase tracking-tighter">
-                        {item.category}
-                      </span>
-                    </td>
                     <td className="px-8 py-6 text-sm text-slate-500 font-mono italic">
-                      {item.date}
+                      {item.updatedAt}
                     </td>
                     <td className="px-8 py-6">
                       <div className="flex items-center justify-end gap-3">
-                        <div
-                          className={`px-4 py-2 rounded-lg font-mono text-sm transition-all duration-300 ${decryptedId === item.id ? "bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/30" : "bg-slate-800/50 text-slate-600 blur-sm select-none"}`}
-                        >
-                          {decryptedId === item.id
-                            ? item.value
-                            : "••••••••••••"}
+                        <div className={`px-4 py-2 rounded-lg font-mono text-sm transition-all duration-300`}>
+                          {item.submissionData}
                         </div>
-
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            className="p-2 hover:text-white text-slate-500 transition-colors"
-                            title="Copy"
-                          >
-                            <Copy size={16} />
-                          </button>
-                          <button
-                            onClick={() => setDecryptedId(decryptData(item.id, UserKey))}
-                            className="p-2 hover:text-white text-slate-500 transition-colors"
-                            title={decryptedId === item.id ? "Hide" : "Decrypt"}
-                          >
-                            {decryptedId === item.id ? (
-                              <EyeOff size={18} />
-                            ) : (
-                              <Eye size={18} />
-                            )}
-                          </button>
                           <button className="p-2 hover:text-red-400 text-slate-500 transition-colors">
                             <Trash2 size={16} />
                           </button>
                         </div>
-                      </div>
                     </td>
                   </tr>
                 ))}

@@ -33,19 +33,18 @@ export const submitLogin = async(email, password) => {
 }
 
 export const submitSecret = async (key, data, userID, vaultID, name, iv) => {
-    var submissionData = "";
-    submissionData, iv = encryptData(data, key);
-
-    const submission = new FormData();
-    submission.append("userID", userID);
-    submission.append("vaultID", vaultID);
-    submission.append("name", name);
-    submission.append("submissionData", submissionData);
-    submission.append("iv", iv);
+    const encryptedResult = await encryptData(data, key, iv);
+    const submissionData = btoa(String.fromCharCode(...new Uint8Array(encryptedResult.cipherText)));
+    const ivString = btoa(String.fromCharCode(...iv));
 
     try{
-        //Insert backend address here
-        const result = await axios.post("http://localhost:3000/data/submit", submission);
+        const result = await axios.post("http://localhost:3000/data/submit", {
+            userID,
+            vaultID,
+            name,
+            submissionData,
+            iv: ivString,
+        });
         return result;
     } catch (err) {
         console.error("Post failed");
@@ -63,7 +62,11 @@ export const retriveUserSecrets = async (userID) => {
 }
 
 export const retriveSecretByVault = async (vaultID) => {
-    const res = await axios.get(`http://localhost:3000/data/${vaultID}`);
-    return res.data;
+    const res = await axios.get(`http://localhost:3000/data/vault/${vaultID}`);
+    const items = res.data.result.items.map((item) => {
+        const { iv, submissionData } = JSON.parse(item.submissionData);
+        return { ...item, iv, submissionData };
+    });
+    return items;
 }
 

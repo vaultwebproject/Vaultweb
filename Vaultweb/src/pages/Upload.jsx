@@ -3,8 +3,30 @@ import { ShieldCheck, Lock, ArrowUpCircle, Info, CheckCircle } from 'lucide-reac
 import { submitSecret } from '../utilites/netUtilities';
 
 const Upload = () => {
-  const [formData, setFormData] = useState({ name: '', category: 'General', value: '' });
+  const [formData, setFormData] = useState({ name: '', value: '' });
   const [status, setStatus] = useState('idle'); // idle | encrypting | uploading | success
+  const userInfo = useContext(UserProvider);
+  const [iv, setIV] = useState(new Uint8Array(12));
+
+  function arrayBufferToBase64(buffer) {
+      const bytes = new Uint8Array(buffer);
+      return btoa(String.fromCharCode(...bytes));
+  }
+
+  function base64ToArrayBuffer(base64) {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes.buffer;
+  }
+
+  async function sendToVault() {
+    setIV(window.crypto.getRandomValues(new Uint8Array(12)))
+    submitSecret(userInfo.userKey, formData.value, userInfo.uuID, vaultID, formData.name, iv);
+  }
+
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-[Poppins] pt-24 pb-12 px-6">
@@ -56,16 +78,6 @@ const Upload = () => {
               className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500/50 outline-none transition-all"
               onChange={(e) => setFormData({...formData, name: e.target.value})}
             />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Category</label>
-            <select className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500/50 outline-none transition-all appearance-none">
-              <option>Infrastructure</option>
-              <option>Finance</option>
-              <option>Internal Keys</option>
-              <option>General</option>
-            </select>
           </div>
 
           <div>

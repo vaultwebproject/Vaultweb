@@ -22,13 +22,12 @@ export const createKeyPair = async () => {
 };
 
 // Encrypts plaintext data using entered key. For use with encrypting user data.
-export const encryptData = async (plainText, key) => {
+export const encryptData = async (plainText, key, iv) => {
     const plainTextBuffer = textEncoder.encode(plainText);
-    const iv = window.crypto.getRandomValues(new Uint8Array(12))
 
     const cipherText = await window.crypto.subtle.encrypt({name: "AES-GCM", iv:iv}, key, plainTextBuffer);
 
-    return {cipherText, iv};
+    return {cipherText};
 };
 
 // Decrypts cipherText using entered key and iv. For use with decrypting retrived user data.
