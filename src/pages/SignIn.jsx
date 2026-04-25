@@ -1,22 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Lock, Mail, ArrowRight, ShieldCheck, Github } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createMasterKey } from '../utilites/cryptoUtilities';
 import { submitLogin, retriveUserInfo } from '../utilites/netUtilities';
-import { useContext } from 'react';
+import { logEvent, LOG_ACTIONS, SEVERITY } from '../utilites/auditLogger';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState("");
 
-  const handleSignIn = (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
-    // Logic: Trigger Auth0 Login or Custom Auth
-    console.log("Initiating secure session for:", email);
-    result = submitLogin(email, password);
-    if (result.confirm == true){
-      userData = retriveUserInfo(result.id);
-      
+    try {
+      const result = await submitLogin(email, password);
+      if (result?.confirm === true) {
+        await logEvent({
+          action:   LOG_ACTIONS.LOGIN_SUCCESS,
+          userId:   result.id ?? 'unknown',
+          userName: email,
+          target:   'Authentication',
+          details:  'User signed in successfully',
+          severity: SEVERITY.INFO,
+        });
+        const userData = await retriveUserInfo(result.id);
+        // TODO: set user context with userData
+      } else {
+        await logEvent({
+          action:   LOG_ACTIONS.LOGIN_FAILED,
+          userId:   'anonymous',
+          userName: email,
+          target:   'Authentication',
+          details:  'Invalid credentials',
+          severity: SEVERITY.WARN,
+        });
+      }
+    } catch {
+      await logEvent({
+        action:   LOG_ACTIONS.LOGIN_FAILED,
+        userId:   'anonymous',
+        userName: email,
+        target:   'Authentication',
+        details:  'Login request error',
+        severity: SEVERITY.WARN,
+      });
     }
   };
 

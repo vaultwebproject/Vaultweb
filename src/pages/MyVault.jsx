@@ -1,36 +1,69 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Lock, Eye, EyeOff, Search, Plus, Trash2, Copy } from "lucide-react";
 import { decryptData } from "../utilites/cryptoUtilities";
-import { retrieveData } from "../utilites/netUtilities";
+import { logEvent, LOG_ACTIONS, SEVERITY } from "../utilites/auditLogger";
+import { UserContext } from "../UserContext";
 
 const MyVault = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [decryptedId, setDecryptedId] = useState(null);
+  const [searchTerm,   setSearchTerm]   = useState("");
+  const [decryptedId,  setDecryptedId]  = useState(null);
+
+  // UserContext may not be fully wired yet — fall back to safe defaults
+  const ctx      = useContext(UserContext) ?? {};
+  const userId   = ctx.uuID     || 'anonymous';
+  const userName = ctx.userName || 'Unknown User';
+  const userKey  = ctx.userKey  || null;
 
   // Mock Data: In reality, 'value' would be an Encrypted Blob from your DB
   const vaultItems = [
-    {
-      id: 1,
-      name: "Database Production",
-      category: "Infrastructure",
-      value: "db_prod_9921_xX",
-      date: "2024-05-10",
-    },
-    {
-      id: 2,
-      name: "Stripe API Key",
-      category: "Finance",
-      value: "sk_live_51Mh...",
-      date: "2024-05-12",
-    },
-    {
-      id: 3,
-      name: "Admin Panel Password",
-      category: "Internal",
-      value: "Admin!@#2024",
-      date: "2024-05-15",
-    },
+    { id: 1, name: "Database Production", category: "Infrastructure", value: "db_prod_9921_xX", date: "2024-05-10" },
+    { id: 2, name: "Stripe API Key",       category: "Finance",        value: "sk_live_51Mh...",  date: "2024-05-12" },
+    { id: 3, name: "Admin Panel Password", category: "Internal",       value: "Admin!@#2024",     date: "2024-05-15" },
   ];
+
+  const handleDecrypt = async (item) => {
+    if (decryptedId === item.id) {
+      setDecryptedId(null);
+      return;
+    }
+    setDecryptedId(item.id);
+    await logEvent({
+      action:   LOG_ACTIONS.SECRET_VIEWED,
+      userId,
+      userName,
+      target:   item.name,
+      details:  `Category: ${item.category}`,
+      severity: SEVERITY.INFO,
+    });
+  };
+
+  const handleCopy = async (item) => {
+    try {
+      await navigator.clipboard.writeText(item.value);
+    } catch {
+      /* clipboard not available */
+    }
+    await logEvent({
+      action:   LOG_ACTIONS.SECRET_COPIED,
+      userId,
+      userName,
+      target:   item.name,
+      details:  `Category: ${item.category}`,
+      severity: SEVERITY.INFO,
+    });
+  };
+
+  const handleDelete = async (item) => {
+    await logEvent({
+      action:   LOG_ACTIONS.SECRET_DELETED,
+      userId,
+      userName,
+      target:   item.name,
+      details:  `Category: ${item.category}`,
+      severity: SEVERITY.WARN,
+    });
+    // TODO: call delete API and refresh vault items
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-[Poppins] pt-24 pb-12 px-6">
@@ -66,39 +99,24 @@ const MyVault = () => {
         <div className="bg-slate-900/40 border border-white/5 rounded-3xl backdrop-blur-xl overflow-hidden shadow-2xl">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-white/[0.02] border-b border-white/5">
-                <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">
-                  Secret Name
-                </th>
-                <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">
-                  Category
-                </th>
-                <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">
-                  Modified
-                </th>
-                <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">
-                  Value
-                </th>
+              <tr className="bg-white/2 border-b border-white/5">
+                <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Secret Name</th>
+                <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Category</th>
+                <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Modified</th>
+                <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Value</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {vaultItems
-                .filter((item) =>
-                  item.name.toLowerCase().includes(searchTerm.toLowerCase()),
-                )
+                .filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
                 .map((item) => (
-                  <tr
-                    key={item.id}
-                    className="hover:bg-white/[0.01] transition-colors group"
-                  >
+                  <tr key={item.id} className="hover:bg-white/1 transition-colors group">
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400">
                           <Lock size={16} />
                         </div>
-                        <span className="font-semibold text-white">
-                          {item.name}
-                        </span>
+                        <span className="font-semibold text-white">{item.name}</span>
                       </div>
                     </td>
                     <td className="px-8 py-6">
@@ -106,38 +124,38 @@ const MyVault = () => {
                         {item.category}
                       </span>
                     </td>
-                    <td className="px-8 py-6 text-sm text-slate-500 font-mono italic">
-                      {item.date}
-                    </td>
+                    <td className="px-8 py-6 text-sm text-slate-500 font-mono italic">{item.date}</td>
                     <td className="px-8 py-6">
                       <div className="flex items-center justify-end gap-3">
                         <div
-                          className={`px-4 py-2 rounded-lg font-mono text-sm transition-all duration-300 ${decryptedId === item.id ? "bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/30" : "bg-slate-800/50 text-slate-600 blur-sm select-none"}`}
+                          className={`px-4 py-2 rounded-lg font-mono text-sm transition-all duration-300 ${
+                            decryptedId === item.id
+                              ? "bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/30"
+                              : "bg-slate-800/50 text-slate-600 blur-sm select-none"
+                          }`}
                         >
-                          {decryptedId === item.id
-                            ? item.value
-                            : "••••••••••••"}
+                          {decryptedId === item.id ? item.value : "••••••••••••"}
                         </div>
 
                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
+                            onClick={() => handleCopy(item)}
                             className="p-2 hover:text-white text-slate-500 transition-colors"
                             title="Copy"
                           >
                             <Copy size={16} />
                           </button>
                           <button
-                            onClick={() => setDecryptedId(decryptData(item.id, UserKey))}
+                            onClick={() => handleDecrypt(item)}
                             className="p-2 hover:text-white text-slate-500 transition-colors"
                             title={decryptedId === item.id ? "Hide" : "Decrypt"}
                           >
-                            {decryptedId === item.id ? (
-                              <EyeOff size={18} />
-                            ) : (
-                              <Eye size={18} />
-                            )}
+                            {decryptedId === item.id ? <EyeOff size={18} /> : <Eye size={18} />}
                           </button>
-                          <button className="p-2 hover:text-red-400 text-slate-500 transition-colors">
+                          <button
+                            onClick={() => handleDelete(item)}
+                            className="p-2 hover:text-red-400 text-slate-500 transition-colors"
+                          >
                             <Trash2 size={16} />
                           </button>
                         </div>
@@ -148,13 +166,10 @@ const MyVault = () => {
             </tbody>
           </table>
 
-          {/* Empty State Mockup */}
           {vaultItems.length === 0 && (
             <div className="py-20 text-center">
               <Lock size={48} className="mx-auto text-slate-800 mb-4" />
-              <p className="text-slate-500 font-medium">
-                Your vault is empty. Start securing your data.
-              </p>
+              <p className="text-slate-500 font-medium">Your vault is empty. Start securing your data.</p>
             </div>
           )}
         </div>
