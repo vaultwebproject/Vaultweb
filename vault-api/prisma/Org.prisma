@@ -1,6 +1,7 @@
 model Org {
-    id        String   @id @unique @default(uuid(7))
-    users     User[]
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id          String       @id @unique @default(uuid(7))
+  users       User[]
+  departments Department[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }

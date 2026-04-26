@@ -1,9 +1,11 @@
 model Vault {
-    id          String      @id @unique @default(uuid(7))
-    name        String
-    items       Item[]
-    userVaults  UserVault[]
-    currentDate DateTime    @default(now())
-    createdAt   DateTime    @default(now())
-    updatedAt   DateTime    @updatedAt
+  id           String      @id @unique @default(uuid(7))
+  name         String
+  items        Item[]
+  userVaults   UserVault[]
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  currentDate  DateTime    @default(now())
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 }
