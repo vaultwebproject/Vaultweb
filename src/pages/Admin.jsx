@@ -60,8 +60,8 @@ const Admin = () => {
   const [filterAction, setFilterAction] = useState('ALL');
   const [search,       setSearch]       = useState('');
 
-  const loadLogs = useCallback(() => {
-    setLogs(getLogs());
+  const loadLogs = useCallback(async () => {
+    setLogs(await getLogs());
     setChainStatus(null);
   }, []);
 
@@ -74,9 +74,9 @@ const Admin = () => {
     setVerifying(false);
   };
 
-  const handleClear = () => {
+  const handleClear = async () => {
     if (window.confirm('Clear all audit logs? This cannot be undone.')) {
-      clearLogs();
+      await clearLogs();
       loadLogs();
     }
   };
