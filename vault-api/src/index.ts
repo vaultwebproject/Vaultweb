@@ -25,7 +25,7 @@ app.get("/", (c) => {
 const openapi = fromHono(app);
 
 openapi.get("/org/:orgId/vaults/:vaultId", GetVaultById);
-openapi.post("/auth/login", PostLogin);
+openapi.post("/auth/login", PostLogin); // PostLogin route to the OpenAPI router
 openapi.get("/users/:userId", GetUserById);
 openapi.post("/data/submit", PostSubmitSecret);
 openapi.get("/data/:userId", GetUserData);
