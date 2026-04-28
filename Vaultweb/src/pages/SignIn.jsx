@@ -5,11 +5,13 @@ import { createMasterKey } from '../utilites/cryptoUtilities';
 import { submitLogin, retriveUserInfo } from '../utilites/netUtilities';
 import { useContext } from 'react';
 import UserProvider from "../UserContext";
+import { useNavigate } from 'react-router-dom';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState("");
   const userInfo = useContext(UserProvider);
+  const navigate = useNavigate();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -17,6 +19,13 @@ const SignIn = () => {
     const result = await submitLogin(email, password);
     if (result?.confirm === true) {
       const userData = await retriveUserInfo(result.id);
+      if (userData != null){
+        userInfo.setUserName(userData.userName);
+        userInfo.setuuID(userData.uuID);
+        userInfo.setUserKey(createMasterKey(email, password));
+        localStorage.setItem('token', userInfo.token);
+        navigate('/vault');
+      }
     }
   };
 
