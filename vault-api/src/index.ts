@@ -11,7 +11,9 @@ import { PostSubmitSecret } from "./routes/data/PostSubmitSecret.js";
 import { GetUserData } from "./routes/data/GetUserData.js";
 import { GetSecretByVault } from "./routes/data/GetSecretByVault.js";
 
+import { PostAccount } from "./routes/auth/PostAccount.js";
 const app = new Hono();
+
 
 app.use(cors({ origin: "http://localhost:5173" })); // Enable CORS for requests from the frontend running on localhost:5173
 
@@ -30,6 +32,10 @@ openapi.get("/users/:userId", GetUserById);
 openapi.post("/data/submit", PostSubmitSecret);
 openapi.get("/data/:userId", GetUserData);
 openapi.get("/data/vault/:vaultId", GetSecretByVault);
+
+openapi.post("/createAccount", PostAccount); // Matches your netUtilities call
+openapi.post("/auth/login", PostLogin);
+openapi.get("/users/:userId", GetUserById);
 
 serve(
   {

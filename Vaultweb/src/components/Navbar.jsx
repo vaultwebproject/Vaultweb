@@ -1,105 +1,66 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import { ShieldCheck, Menu, X, Upload as UploadIcon } from "lucide-react";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+
+  // Helper to highlight active links
+  const isActive = (path) => location.pathname === path;
 
   return (
-    // Reduced height to h-20 for a cleaner look; h-30 was likely too tall.
-    <nav className="relative h-20 w-full px-4 sm:px-6 bg-gradient-to-b from-gray-900 to-black shadow-2xl border-b border-indigo-500/30 font-[Poppins] overflow-hidden">
-      {/* 1. MAIN WRAPPER: items-center and h-full keeps everything aligned vertically */}
-      <div className="max-w-7xl mx-auto h-full flex items-center justify-between relative">
-        {/* LOGO SECTION (Left) */}
-        <div className="flex items-center space-x-2 group cursor-pointer z-50">
-          <div className="relative flex items-center justify-center">
-            <div className="absolute -inset-2 bg-gradient-to-r from-purple-600 to-blue-500 rounded-full blur opacity-30 group-hover:opacity-100 transition duration-500 animate-spin-slow"></div>
-            <div className="relative bg-black rounded-full p-2 border border-white/10">
-              <svg
-                className="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                />
-              </svg>
+    <nav className="fixed top-0 left-0 w-full h-20 z-[100] bg-white/70 backdrop-blur-xl border-b border-sky-100/50 font-[Poppins] transition-all">
+      <div className="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
+        {/* 1. LOGO SECTION */}
+        <Link to="/" className="flex items-center space-x-3 group z-[110]">
+          <div className="relative">
+            {/* Soft Cyan Glow behind logo */}
+            <div className="absolute -inset-1.5 bg-sky-400/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition duration-500" />
+            <div className="relative bg-white border border-sky-100 rounded-xl p-2 shadow-sm shadow-sky-200/50 group-hover:scale-110 transition-transform duration-300">
+              <ShieldCheck className="w-6 h-6 text-sky-600" />
             </div>
-            <span className="ml-3 text-xl font-bold text-white tracking-wider group-hover:text-purple-400 transition-colors">
-              VAULT<span className="text-purple-500">WEB</span>
-            </span>
           </div>
-        </div>
+          <span className="text-xl font-black text-slate-900 tracking-tighter">
+            VAULT<span className="text-sky-500">WEB</span>
+          </span>
+        </Link>
 
         {/* 2. DESKTOP MENU (Absolute Center) */}
-        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center space-x-10 text-xs font-bold text-gray-400 tracking-widest">
-          <a href="#" className="hover:text-white transition-colors">
-            HOME
-          </a>
-          <a href="/vault" className="hover:text-white transition-colors">
-            VAULTS
-          </a>
-          <a href="/create-org" className="hover:text-white transition-colors">
-            ORGANISATION
-          </a>
-          <a href="/admin" className="hover:text-white transition-colors">
-            ADMIN
-          </a>
+        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center space-x-8 text-[11px] font-black tracking-[0.2em] text-slate-400">
+          {[
+            { name: "HOME", path: "/" },
+            { name: "VAULTS", path: "/vault" },
+            { name: "ORGANISATION", path: "/create-org" },
+            { name: "ADMIN", path: "/admin" },
+          ].map((link) => (
+            <Link
+              key={link.name}
+              to={link.path}
+              className={`hover:text-sky-600 transition-colors ${
+                isActive(link.path) ? "text-sky-600" : ""
+              }`}
+            >
+              {link.name}
+            </Link>
+          ))}
         </div>
 
-        {/* 3. RIGHT SIDE: Actions & Toggle */}
-        <div className="flex items-center space-x-5 z-50">
-            <Link to="signin">
-          <button className="hidden md:block text-xs font-bold text-gray-400 hover:text-white transition-colors uppercase tracking-widest">
+        {/* 3. RIGHT SIDE: Actions */}
+        <div className="flex items-center space-x-6 z-[110]">
+          <Link
+            to="/signin"
+            className="hidden md:block text-[11px] font-black text-slate-500 hover:text-sky-600 uppercase tracking-widest transition-colors"
+          >
             Sign In
-          </button>
           </Link>
 
           <Link to="/upload">
-            <button className="hidden md:block px-5 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-[11px] rounded-full font-black hover:shadow-[0_0_20px_rgba(147,51,234,0.3)] transition-all active:scale-95 uppercase">
+            <button className="hidden md:flex items-center gap-2 px-6 py-2.5 bg-sky-600 text-white text-[11px] rounded-full font-black hover:bg-sky-700 hover:shadow-lg hover:shadow-sky-200 transition-all active:scale-95 uppercase tracking-widest">
+              <UploadIcon size={14} />
               Upload
             </button>
           </Link>
 
-          {/* Mobile Toggle Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1.5 focus:outline-none"
-          >
-            <span
-              className={`block w-6 h-0.5 bg-white transition-all duration-300 ${isOpen ? "rotate-45 translate-y-2" : ""}`}
-            ></span>
-            <span
-              className={`block w-6 h-0.5 bg-white transition-opacity duration-300 ${isOpen ? "opacity-0" : ""}`}
-            ></span>
-            <span
-              className={`block w-6 h-0.5 bg-white transition-all duration-300 ${isOpen ? "-rotate-45 -translate-y-2" : ""}`}
-            ></span>
-          </button>
-        </div>
-      </div>
-
-      {/* Decorative Background Circles - Fixed Z-index so they stay behind */}
-      <div className="absolute -z-10 hidden md:block -top-1/2 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full border border-white/5 bg-gradient-to-b from-purple-900/20 to-transparent backdrop-blur-xl pointer-events-none" />
-      <div className="absolute -z-10 hidden md:block -top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 w-64 h-64 rounded-full bg-purple-600/20 blur-2xl opacity-40 animate-pulse" />
-
-      {/* Mobile Menu Overlay */}
-      <div
-        className={`fixed inset-0 bg-black/95 transition-transform duration-500 z-[60] md:hidden ${isOpen ? "translate-x-0" : "translate-x-full"}`}
-      >
-        <div className="flex flex-col items-center justify-center h-full space-y-8 text-2xl text-white font-medium">
-          <a href="#" onClick={() => setIsOpen(false)}>
-            Home
-          </a>
-          <a href="/vault" onClick={() => setIsOpen(false)}>
-            Vaults
-          </a>
-          <a href="#" onClick={() => setIsOpen(false)}>
-            Settings
-          </a>
         </div>
       </div>
     </nav>
