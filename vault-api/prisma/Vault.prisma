@@ -1,9 +1,12 @@
+
+// Each vault can contain multiple items and can be accessed by multiple users through the UserVault relation.
 model Vault {
-    id          String      @id @unique @default(uuid(7))
-    name        String
-    items       Item[]
-    userVaults  UserVault[]
-    currentDate DateTime    @default(now())
-    createdAt   DateTime    @default(now())
-    updatedAt   DateTime    @updatedAt
+    id         String      @id @unique @default(uuid(7))
+    name       String
+    departmentId String
+    department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+    items      Item[]
+    userVaults UserVault[]
+    createdAt  DateTime    @default(now())
+    updatedAt  DateTime    @updatedAt
 }

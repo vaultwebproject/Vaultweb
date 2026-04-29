@@ -5,12 +5,16 @@ enum UserRole {
 
 model User {
     id           String      @id @unique @default(uuid(7))
-    orgId        String
-    org          Org         @relation(fields: [orgId], references: [id], onDelete: Cascade)
+    orgId        String?
+    org          Org?        @relation(fields: [orgId], references: [id], onDelete: Cascade)
     email        String      @unique
     passwordHash String
-    role         UserRole
-    userVaults   UserVault[]
+    publicKey           String?
+    encryptedPrivateKey String?
+    salt                String?
+    role         UserRole    @default(ORG_USER)
+    userVaults      UserVault[]
+    userDepartments UserDepartment[]
     createdAt    DateTime    @default(now())
     updatedAt    DateTime    @updatedAt
 }
