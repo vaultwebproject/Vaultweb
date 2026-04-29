@@ -1,22 +1,19 @@
 import React from 'react';
 import axios from 'axios';
-import { encryptData, decryptData } from './cryptoUtilities';
+import { encryptData, decryptData, exportPublicKey, createKeyPair, generateSalt, encryptPrivateKey, createMasterKey } from './cryptoUtilities';
 import {sha1,sha256,sha384,sha512} from 'crypto-hash';
 
-export const submitAccount = async(email, role, password, organisation) => {
-    const submission = new FormData();
-
+export const submitAccount = async(email, password) => {
     const passHash = await sha256(password);
-
-    submission.append("email", email);
-    submission.append("role", role);
-    submission.append("passHash", passHash);
-    submission.append("organisation", organisation);
-
-    try{
-        //Insert backend address here
-        const result = await axios.post("http://localhost:3000/createAccount", submission);
-        return result;
+    const saltBase64 = generateSalt();
+    const saltBytes = Uint8Array.from(atob(saltBase64), c => c.charCodeAt(0));
+    const masterKey = await createMasterKey(password, saltBytes);
+    const keyPair = await createKeyPair();
+    const publicKey = await exportPublicKey(keyPair.publicKey);
+    const encryptedPrivKey = await encryptPrivateKey(keyPair.privateKey, masterKey);
+    try {
+        const result = await axios.post("http://localhost:3000/createAccount", { email, passHash, publicKey, encryptedPrivateKey: encryptedPrivKey, salt: saltBase64 });
+        return result.data;
     } catch (err) {
         console.error("Post failed");
     }

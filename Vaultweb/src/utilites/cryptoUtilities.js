@@ -59,9 +59,32 @@ export const decryptDataPublic = async (cipherText, key) => {
 };
 
 export const encryptBase64 = async (plainText) => {
-    
+
 }
 
 export const decryptBase64 = async (cipherText) => {
-    
+
 }
+
+// Exports a public CryptoKey to a base64 string for sending to the backend.
+export const exportPublicKey = async (publicKey) => {
+    const exported = await window.crypto.subtle.exportKey("spki", publicKey);
+    const bytes = new Uint8Array(exported);
+    return btoa(String.fromCharCode(...bytes));
+};
+
+// Generates a random salt for master key derivation.
+export const generateSalt = () => {
+    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+    return btoa(String.fromCharCode(...salt));
+};
+
+// Encrypts the private RSA key with the master key for server storage.
+export const encryptPrivateKey = async (privateKey, masterKey) => {
+    const exported = await window.crypto.subtle.exportKey("pkcs8", privateKey);
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    const encrypted = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv }, masterKey, exported);
+    const ivBase64 = btoa(String.fromCharCode(...iv));
+    const dataBase64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+    return `${ivBase64}.${dataBase64}`;
+};

@@ -1,11 +1,7 @@
-import React, { useState } from 'react';
-import { Lock, Mail, ArrowRight, ShieldCheck, Github } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { createMasterKey } from '../utilites/cryptoUtilities';
-import { submitAccount, retriveUserInfo } from '../utilites/netUtilities';
-import { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { UserContext } from '../UserContext';
+import { ArrowRight, Lock, Mail, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { submitAccount } from '../utilites/netUtilities';
 
 const SignUp = () => {
     const [email, setEmail] = useState('');
@@ -14,8 +10,9 @@ const SignUp = () => {
 
     const navigate = useNavigate();
 
-    const handleSignUp = (e) => {
-        result = submitAccount(email, "", password, organisation);
+    const handleSignUp = async (e) => {
+        e.preventDefault();
+        await submitAccount(email, password);
         navigate("/signin");
     };
 
@@ -83,7 +80,7 @@ const SignUp = () => {
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4" />
                             <input 
                                 type="text" 
-                                required
+                                //required
                                 value={organisation}
                                 onChange={(e) => setOrganisation(e.target.value)}
                                 className="w-full bg-slate-950 border border-white/5 rounded-xl pl-12 pr-4 py-3.5 text-white focus:ring-2 focus:ring-purple-500/50 outline-none transition-all"
