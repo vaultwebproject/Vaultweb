@@ -13,7 +13,12 @@ const MyVault = () => {
   useEffect(() => {
     async () => {
       const result = retriveUserSecrets(userInfo.uuID);
-      setVaultItems(result);
+      const decrypted = [];
+      for (items in result) {
+        const plainText = await decryptData(item.submissionData, userInfo.userKey, item.iv);
+        decrypted.push({ ...item, submissionData: plainText });
+      }
+      setVaultItems(decrypted);
     }
   }, []);
 
@@ -90,13 +95,8 @@ const MyVault = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="px-10 py-7">
-                      <span className="px-3 py-1 bg-white border border-sky-100 rounded-lg text-[10px] font-black text-sky-600 uppercase tracking-tighter">
-                        {item.category}
-                      </span>
-                    </td>
                     <td className="px-10 py-7 text-sm text-slate-400 font-medium italic">
-                      {item.date}
+                      {item.updatedAt}
                     </td>
                     <td className="px-10 py-7">
                       <div className="flex items-center justify-end gap-4">
@@ -104,26 +104,15 @@ const MyVault = () => {
                           className={`px-5 py-2.5 rounded-xl font-mono text-sm transition-all duration-500 border ${decryptedId === item.id ? "bg-sky-50 border-sky-200 text-sky-700 shadow-inner" : "bg-slate-50 border-slate-100 text-slate-300 blur-[3px] select-none"}`}
                         >
                           {decryptedId === item.id
-                            ? item.value
+                            ? item.submissionData
                             : "••••••••••••"}
                         </div>
-
                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
                           <button
                             className="p-2.5 hover:bg-sky-100 rounded-lg text-slate-400 hover:text-sky-600 transition-all"
                             title="Copy"
                           >
                             <Copy size={18} />
-                          </button>
-                          <button
-                            onClick={() => setDecryptedId(decryptData(item.id, UserKey))}
-                            className="p-2.5 rounded-lg transition-all"
-                             title={decryptedId === item.id ? "Hide Value" : "Show Value"}>
-                            {decryptedId === item.id ? (
-                              <EyeOff size={18} />
-                            ) : (
-                              <Eye size={18} />
-                            )}
                           </button>
                           <button className="p-2.5 hover:bg-red-50 rounded-lg text-slate-400 hover:text-red-500 transition-all">
                               <Trash2 size={18} />
