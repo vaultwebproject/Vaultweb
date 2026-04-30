@@ -54,7 +54,6 @@ const MyVault = () => {
             </button>
           </div>
         </div>
-
         {/* Vault Table Card */}
         <div className="bg-white/80 border border-sky-100 rounded-[2.5rem] backdrop-blur-xl overflow-hidden shadow-2xl shadow-sky-200/30">
           <div className="overflow-x-auto">
