@@ -8,12 +8,29 @@ import { logEvent, LOG_ACTIONS, SEVERITY } from '../utilites/auditLogger';
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState("");
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { setUserName, setUserKey, setuuID } = useContext(UserContext) || {};
 
   const handleSignIn = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
     try {
       const result = await submitLogin(email, password);
       if (result?.confirm === true) {
+        // Create master key from password for decryption
+        const salt = new TextEncoder().encode(result.id);
+        const masterKey = await createMasterKey(password, salt);
+        
+        // Fetch user data
+        const userData = await retriveUserInfo(result.id);
+        
+        // Update user context
+        if (setUserName) setUserName(email);
+        if (setUserKey) setUserKey(masterKey);
+        if (setuuID) setuuID(result.id);
+        
         await logEvent({
           action:   LOG_ACTIONS.LOGIN_SUCCESS,
           userId:   result.id ?? 'unknown',
@@ -22,9 +39,11 @@ const SignIn = () => {
           details:  'User signed in successfully',
           severity: SEVERITY.INFO,
         });
-        const userData = await retriveUserInfo(result.id);
-        // TODO: set user context with userData
+        
+        // Redirect to vault
+        window.location.href = '/vault';
       } else {
+        setError('Invalid email or password');
         await logEvent({
           action:   LOG_ACTIONS.LOGIN_FAILED,
           userId:   'anonymous',
@@ -34,15 +53,18 @@ const SignIn = () => {
           severity: SEVERITY.WARN,
         });
       }
-    } catch {
+    } catch (err) {
+      setError('Login failed. Please try again.');
       await logEvent({
         action:   LOG_ACTIONS.LOGIN_FAILED,
         userId:   'anonymous',
         userName: email,
         target:   'Authentication',
-        details:  'Login request error',
+        details:  'Login request error: ' + (err?.message || 'Unknown error'),
         severity: SEVERITY.WARN,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -101,11 +123,18 @@ const SignIn = () => {
               </div>
             </div>
 
+            {error && (
+              <div className="bg-red-900/30 border border-red-700/50 rounded-xl p-3 text-sm text-red-200">
+                {error}
+              </div>
+            )}
+
             <button 
               type="submit" 
-              className="w-full bg-white text-black py-4 rounded-xl font-bold hover:bg-slate-200 transition-all flex items-center justify-center gap-2 group"
+              disabled={loading}
+              className="w-full bg-white text-black py-4 rounded-xl font-bold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 group"
             >
-              Sign In <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              {loading ? 'Signing In...' : 'Sign In'} <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </form>
 

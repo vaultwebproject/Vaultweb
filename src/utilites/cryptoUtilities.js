@@ -58,10 +58,44 @@ export const decryptDataPublic = async (cipherText, key) => {
     return(plainText);
 };
 
-export const encryptBase64 = async (plainText) => {
-    
-}
+// Helper function to convert bytes to Base64
+const bytesToBase64 = (bytes) => {
+    const binary = String.fromCharCode.apply(null, new Uint8Array(bytes));
+    return btoa(binary);
+};
 
-export const decryptBase64 = async (cipherText) => {
+// Helper function to convert Base64 to bytes
+const base64ToBytes = (base64) => {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+};
+
+// Encrypts plainText to Base64 encoded string using provided key (or generates one)
+export const encryptBase64 = async (plainText, key = null) => {
+    if (!key) {
+        // Generate a default key if none provided
+        key = await window.crypto.subtle.generateKey(
+            { name: "AES-GCM", length: 256 },
+            true,
+            ["encrypt", "decrypt"]
+        );
+    }
     
-}
+    const { cipherText, iv } = await encryptData(plainText, key);
+    const cipherBase64 = bytesToBase64(cipherText);
+    const ivBase64 = bytesToBase64(iv);
+    
+    return { cipherBase64, ivBase64, key };
+};
+
+// Decrypts Base64 encoded cipherText using provided key and iv
+export const decryptBase64 = async (cipherBase64, key, ivBase64) => {
+    const cipherText = base64ToBytes(cipherBase64);
+    const iv = base64ToBytes(ivBase64);
+    
+    return await decryptData(cipherText, key, iv);
+};

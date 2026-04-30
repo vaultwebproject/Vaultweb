@@ -1,12 +1,16 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Lock, Eye, EyeOff, Search, Plus, Trash2, Copy } from "lucide-react";
 import { decryptData } from "../utilites/cryptoUtilities";
 import { logEvent, LOG_ACTIONS, SEVERITY } from "../utilites/auditLogger";
+import { retriveUserSecrets } from "../utilites/netUtilities";
 import { UserContext } from "../UserContext";
 
 const MyVault = () => {
   const [searchTerm,   setSearchTerm]   = useState("");
   const [decryptedId,  setDecryptedId]  = useState(null);
+  const [vaultItems, setVaultItems]     = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [error, setError]               = useState('');
 
   // UserContext may not be fully wired yet — fall back to safe defaults
   const ctx      = useContext(UserContext) ?? {};
@@ -14,12 +18,31 @@ const MyVault = () => {
   const userName = ctx.userName || 'Unknown User';
   const userKey  = ctx.userKey  || null;
 
-  // Mock Data: In reality, 'value' would be an Encrypted Blob from your DB
-  const vaultItems = [
-    { id: 1, name: "Database Production", category: "Infrastructure", value: "db_prod_9921_xX", date: "2024-05-10" },
-    { id: 2, name: "Stripe API Key",       category: "Finance",        value: "sk_live_51Mh...",  date: "2024-05-12" },
-    { id: 3, name: "Admin Panel Password", category: "Internal",       value: "Admin!@#2024",     date: "2024-05-15" },
-  ];
+  // Fetch vault items on component mount
+  useEffect(() => {
+    const fetchSecrets = async () => {
+      try {
+        if (!userId || userId === 'anonymous') {
+          setError('User not authenticated');
+          setLoading(false);
+          return;
+        }
+        
+        const secrets = await retriveUserSecrets(userId);
+        if (Array.isArray(secrets)) {
+          setVaultItems(secrets);
+        } else {
+          setError('Failed to load vault items');
+        }
+      } catch (err) {
+        setError('Error loading vault: ' + (err?.message || 'Unknown error'));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSecrets();
+  }, [userId]);
 
   const handleDecrypt = async (item) => {
     if (decryptedId === item.id) {
@@ -97,6 +120,22 @@ const MyVault = () => {
 
         {/* Vault Table Card */}
         <div className="bg-slate-900/40 border border-white/5 rounded-3xl backdrop-blur-xl overflow-hidden shadow-2xl">
+          {error && (
+            <div className="bg-red-900/30 border border-red-700/50 rounded-xl p-4 m-6 text-sm text-red-200">
+              {error}
+            </div>
+          )}
+
+          {loading && (
+            <div className="py-20 text-center">
+              <div className="animate-spin text-purple-500 mb-4 inline-block">
+                <Lock size={48} />
+              </div>
+              <p className="text-slate-500 font-medium">Loading your vault...</p>
+            </div>
+          )}
+
+          {!loading && !error && (
           <table className="w-full text-left">
             <thead>
               <tr className="bg-white/2 border-b border-white/5">
@@ -165,8 +204,9 @@ const MyVault = () => {
                 ))}
             </tbody>
           </table>
+          )}
 
-          {vaultItems.length === 0 && (
+          {!loading && !error && vaultItems.length === 0 && (
             <div className="py-20 text-center">
               <Lock size={48} className="mx-auto text-slate-800 mb-4" />
               <p className="text-slate-500 font-medium">Your vault is empty. Start securing your data.</p>
