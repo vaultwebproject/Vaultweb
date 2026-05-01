@@ -21,6 +21,33 @@ const MyVault = () => {
       setVaultItems(decrypted);
     }
   }, []);
+  
+  const handleCopy = async (item) => {
+    try {
+      await navigator.clipboard.writeText(item.value);
+    } catch {
+      /* clipboard not available */
+    }
+    await logEvent({
+      action:   LOG_ACTIONS.SECRET_COPIED,
+      userId,
+      userName,
+      target:   item.name,
+      details:  `Category: ${item.category}`,
+      severity: SEVERITY.INFO,
+    });
+  };
+
+  const handleDelete = async (item) => {
+    await logEvent({
+      action:   LOG_ACTIONS.SECRET_DELETED,
+      userId,
+      userName,
+      target:   item.name,
+      details:  `Category: ${item.category}`,
+      severity: SEVERITY.WARN,
+    });
+  };
 
   // Mock Data: In reality, 'value' would be an Encrypted Blob from your DB
 
