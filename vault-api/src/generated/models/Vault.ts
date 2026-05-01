@@ -27,6 +27,7 @@ export type AggregateVault = {
 export type VaultMinAggregateOutputType = {
   id: string | null
   name: string | null
+  departmentId: string | null
   currentDate: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -35,6 +36,7 @@ export type VaultMinAggregateOutputType = {
 export type VaultMaxAggregateOutputType = {
   id: string | null
   name: string | null
+  departmentId: string | null
   currentDate: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -43,6 +45,7 @@ export type VaultMaxAggregateOutputType = {
 export type VaultCountAggregateOutputType = {
   id: number
   name: number
+  departmentId: number
   currentDate: number
   createdAt: number
   updatedAt: number
@@ -53,6 +56,7 @@ export type VaultCountAggregateOutputType = {
 export type VaultMinAggregateInputType = {
   id?: true
   name?: true
+  departmentId?: true
   currentDate?: true
   createdAt?: true
   updatedAt?: true
@@ -61,6 +65,7 @@ export type VaultMinAggregateInputType = {
 export type VaultMaxAggregateInputType = {
   id?: true
   name?: true
+  departmentId?: true
   currentDate?: true
   createdAt?: true
   updatedAt?: true
@@ -69,6 +74,7 @@ export type VaultMaxAggregateInputType = {
 export type VaultCountAggregateInputType = {
   id?: true
   name?: true
+  departmentId?: true
   currentDate?: true
   createdAt?: true
   updatedAt?: true
@@ -150,6 +156,7 @@ export type VaultGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type VaultGroupByOutputType = {
   id: string
   name: string
+  departmentId: string | null
   currentDate: Date
   createdAt: Date
   updatedAt: Date
@@ -179,21 +186,25 @@ export type VaultWhereInput = {
   NOT?: Prisma.VaultWhereInput | Prisma.VaultWhereInput[]
   id?: Prisma.StringFilter<"Vault"> | string
   name?: Prisma.StringFilter<"Vault"> | string
+  departmentId?: Prisma.StringNullableFilter<"Vault"> | string | null
   currentDate?: Prisma.DateTimeFilter<"Vault"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Vault"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Vault"> | Date | string
   items?: Prisma.ItemListRelationFilter
   userVaults?: Prisma.UserVaultListRelationFilter
+  department?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null
 }
 
 export type VaultOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  departmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   currentDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   items?: Prisma.ItemOrderByRelationAggregateInput
   userVaults?: Prisma.UserVaultOrderByRelationAggregateInput
+  department?: Prisma.DepartmentOrderByWithRelationInput
 }
 
 export type VaultWhereUniqueInput = Prisma.AtLeast<{
@@ -202,16 +213,19 @@ export type VaultWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.VaultWhereInput[]
   NOT?: Prisma.VaultWhereInput | Prisma.VaultWhereInput[]
   name?: Prisma.StringFilter<"Vault"> | string
+  departmentId?: Prisma.StringNullableFilter<"Vault"> | string | null
   currentDate?: Prisma.DateTimeFilter<"Vault"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Vault"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Vault"> | Date | string
   items?: Prisma.ItemListRelationFilter
   userVaults?: Prisma.UserVaultListRelationFilter
+  department?: Prisma.XOR<Prisma.DepartmentNullableScalarRelationFilter, Prisma.DepartmentWhereInput> | null
 }, "id" | "id">
 
 export type VaultOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  departmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   currentDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -226,6 +240,7 @@ export type VaultScalarWhereWithAggregatesInput = {
   NOT?: Prisma.VaultScalarWhereWithAggregatesInput | Prisma.VaultScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Vault"> | string
   name?: Prisma.StringWithAggregatesFilter<"Vault"> | string
+  departmentId?: Prisma.StringNullableWithAggregatesFilter<"Vault"> | string | null
   currentDate?: Prisma.DateTimeWithAggregatesFilter<"Vault"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Vault"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Vault"> | Date | string
@@ -239,11 +254,13 @@ export type VaultCreateInput = {
   updatedAt?: Date | string
   items?: Prisma.ItemCreateNestedManyWithoutVaultInput
   userVaults?: Prisma.UserVaultCreateNestedManyWithoutVaultInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutVaultsInput
 }
 
 export type VaultUncheckedCreateInput = {
   id?: string
   name: string
+  departmentId?: string | null
   currentDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -259,11 +276,13 @@ export type VaultUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.ItemUpdateManyWithoutVaultNestedInput
   userVaults?: Prisma.UserVaultUpdateManyWithoutVaultNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutVaultsNestedInput
 }
 
 export type VaultUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -274,6 +293,7 @@ export type VaultUncheckedUpdateInput = {
 export type VaultCreateManyInput = {
   id?: string
   name: string
+  departmentId?: string | null
   currentDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -290,9 +310,20 @@ export type VaultUpdateManyMutationInput = {
 export type VaultUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type VaultListRelationFilter = {
+  every?: Prisma.VaultWhereInput
+  some?: Prisma.VaultWhereInput
+  none?: Prisma.VaultWhereInput
+}
+
+export type VaultOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type VaultScalarRelationFilter = {
@@ -303,6 +334,7 @@ export type VaultScalarRelationFilter = {
 export type VaultCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  departmentId?: Prisma.SortOrder
   currentDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -311,6 +343,7 @@ export type VaultCountOrderByAggregateInput = {
 export type VaultMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  departmentId?: Prisma.SortOrder
   currentDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -319,9 +352,52 @@ export type VaultMaxOrderByAggregateInput = {
 export type VaultMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  departmentId?: Prisma.SortOrder
   currentDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type VaultCreateNestedManyWithoutDepartmentInput = {
+  create?: Prisma.XOR<Prisma.VaultCreateWithoutDepartmentInput, Prisma.VaultUncheckedCreateWithoutDepartmentInput> | Prisma.VaultCreateWithoutDepartmentInput[] | Prisma.VaultUncheckedCreateWithoutDepartmentInput[]
+  connectOrCreate?: Prisma.VaultCreateOrConnectWithoutDepartmentInput | Prisma.VaultCreateOrConnectWithoutDepartmentInput[]
+  createMany?: Prisma.VaultCreateManyDepartmentInputEnvelope
+  connect?: Prisma.VaultWhereUniqueInput | Prisma.VaultWhereUniqueInput[]
+}
+
+export type VaultUncheckedCreateNestedManyWithoutDepartmentInput = {
+  create?: Prisma.XOR<Prisma.VaultCreateWithoutDepartmentInput, Prisma.VaultUncheckedCreateWithoutDepartmentInput> | Prisma.VaultCreateWithoutDepartmentInput[] | Prisma.VaultUncheckedCreateWithoutDepartmentInput[]
+  connectOrCreate?: Prisma.VaultCreateOrConnectWithoutDepartmentInput | Prisma.VaultCreateOrConnectWithoutDepartmentInput[]
+  createMany?: Prisma.VaultCreateManyDepartmentInputEnvelope
+  connect?: Prisma.VaultWhereUniqueInput | Prisma.VaultWhereUniqueInput[]
+}
+
+export type VaultUpdateManyWithoutDepartmentNestedInput = {
+  create?: Prisma.XOR<Prisma.VaultCreateWithoutDepartmentInput, Prisma.VaultUncheckedCreateWithoutDepartmentInput> | Prisma.VaultCreateWithoutDepartmentInput[] | Prisma.VaultUncheckedCreateWithoutDepartmentInput[]
+  connectOrCreate?: Prisma.VaultCreateOrConnectWithoutDepartmentInput | Prisma.VaultCreateOrConnectWithoutDepartmentInput[]
+  upsert?: Prisma.VaultUpsertWithWhereUniqueWithoutDepartmentInput | Prisma.VaultUpsertWithWhereUniqueWithoutDepartmentInput[]
+  createMany?: Prisma.VaultCreateManyDepartmentInputEnvelope
+  set?: Prisma.VaultWhereUniqueInput | Prisma.VaultWhereUniqueInput[]
+  disconnect?: Prisma.VaultWhereUniqueInput | Prisma.VaultWhereUniqueInput[]
+  delete?: Prisma.VaultWhereUniqueInput | Prisma.VaultWhereUniqueInput[]
+  connect?: Prisma.VaultWhereUniqueInput | Prisma.VaultWhereUniqueInput[]
+  update?: Prisma.VaultUpdateWithWhereUniqueWithoutDepartmentInput | Prisma.VaultUpdateWithWhereUniqueWithoutDepartmentInput[]
+  updateMany?: Prisma.VaultUpdateManyWithWhereWithoutDepartmentInput | Prisma.VaultUpdateManyWithWhereWithoutDepartmentInput[]
+  deleteMany?: Prisma.VaultScalarWhereInput | Prisma.VaultScalarWhereInput[]
+}
+
+export type VaultUncheckedUpdateManyWithoutDepartmentNestedInput = {
+  create?: Prisma.XOR<Prisma.VaultCreateWithoutDepartmentInput, Prisma.VaultUncheckedCreateWithoutDepartmentInput> | Prisma.VaultCreateWithoutDepartmentInput[] | Prisma.VaultUncheckedCreateWithoutDepartmentInput[]
+  connectOrCreate?: Prisma.VaultCreateOrConnectWithoutDepartmentInput | Prisma.VaultCreateOrConnectWithoutDepartmentInput[]
+  upsert?: Prisma.VaultUpsertWithWhereUniqueWithoutDepartmentInput | Prisma.VaultUpsertWithWhereUniqueWithoutDepartmentInput[]
+  createMany?: Prisma.VaultCreateManyDepartmentInputEnvelope
+  set?: Prisma.VaultWhereUniqueInput | Prisma.VaultWhereUniqueInput[]
+  disconnect?: Prisma.VaultWhereUniqueInput | Prisma.VaultWhereUniqueInput[]
+  delete?: Prisma.VaultWhereUniqueInput | Prisma.VaultWhereUniqueInput[]
+  connect?: Prisma.VaultWhereUniqueInput | Prisma.VaultWhereUniqueInput[]
+  update?: Prisma.VaultUpdateWithWhereUniqueWithoutDepartmentInput | Prisma.VaultUpdateWithWhereUniqueWithoutDepartmentInput[]
+  updateMany?: Prisma.VaultUpdateManyWithWhereWithoutDepartmentInput | Prisma.VaultUpdateManyWithWhereWithoutDepartmentInput[]
+  deleteMany?: Prisma.VaultScalarWhereInput | Prisma.VaultScalarWhereInput[]
 }
 
 export type VaultCreateNestedOneWithoutItemsInput = {
@@ -352,6 +428,67 @@ export type VaultUpdateOneRequiredWithoutUserVaultsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.VaultUpdateToOneWithWhereWithoutUserVaultsInput, Prisma.VaultUpdateWithoutUserVaultsInput>, Prisma.VaultUncheckedUpdateWithoutUserVaultsInput>
 }
 
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
+export type VaultCreateWithoutDepartmentInput = {
+  id?: string
+  name: string
+  currentDate?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.ItemCreateNestedManyWithoutVaultInput
+  userVaults?: Prisma.UserVaultCreateNestedManyWithoutVaultInput
+}
+
+export type VaultUncheckedCreateWithoutDepartmentInput = {
+  id?: string
+  name: string
+  currentDate?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.ItemUncheckedCreateNestedManyWithoutVaultInput
+  userVaults?: Prisma.UserVaultUncheckedCreateNestedManyWithoutVaultInput
+}
+
+export type VaultCreateOrConnectWithoutDepartmentInput = {
+  where: Prisma.VaultWhereUniqueInput
+  create: Prisma.XOR<Prisma.VaultCreateWithoutDepartmentInput, Prisma.VaultUncheckedCreateWithoutDepartmentInput>
+}
+
+export type VaultCreateManyDepartmentInputEnvelope = {
+  data: Prisma.VaultCreateManyDepartmentInput | Prisma.VaultCreateManyDepartmentInput[]
+}
+
+export type VaultUpsertWithWhereUniqueWithoutDepartmentInput = {
+  where: Prisma.VaultWhereUniqueInput
+  update: Prisma.XOR<Prisma.VaultUpdateWithoutDepartmentInput, Prisma.VaultUncheckedUpdateWithoutDepartmentInput>
+  create: Prisma.XOR<Prisma.VaultCreateWithoutDepartmentInput, Prisma.VaultUncheckedCreateWithoutDepartmentInput>
+}
+
+export type VaultUpdateWithWhereUniqueWithoutDepartmentInput = {
+  where: Prisma.VaultWhereUniqueInput
+  data: Prisma.XOR<Prisma.VaultUpdateWithoutDepartmentInput, Prisma.VaultUncheckedUpdateWithoutDepartmentInput>
+}
+
+export type VaultUpdateManyWithWhereWithoutDepartmentInput = {
+  where: Prisma.VaultScalarWhereInput
+  data: Prisma.XOR<Prisma.VaultUpdateManyMutationInput, Prisma.VaultUncheckedUpdateManyWithoutDepartmentInput>
+}
+
+export type VaultScalarWhereInput = {
+  AND?: Prisma.VaultScalarWhereInput | Prisma.VaultScalarWhereInput[]
+  OR?: Prisma.VaultScalarWhereInput[]
+  NOT?: Prisma.VaultScalarWhereInput | Prisma.VaultScalarWhereInput[]
+  id?: Prisma.StringFilter<"Vault"> | string
+  name?: Prisma.StringFilter<"Vault"> | string
+  departmentId?: Prisma.StringNullableFilter<"Vault"> | string | null
+  currentDate?: Prisma.DateTimeFilter<"Vault"> | Date | string
+  createdAt?: Prisma.DateTimeFilter<"Vault"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Vault"> | Date | string
+}
+
 export type VaultCreateWithoutItemsInput = {
   id?: string
   name: string
@@ -359,11 +496,13 @@ export type VaultCreateWithoutItemsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   userVaults?: Prisma.UserVaultCreateNestedManyWithoutVaultInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutVaultsInput
 }
 
 export type VaultUncheckedCreateWithoutItemsInput = {
   id?: string
   name: string
+  departmentId?: string | null
   currentDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -393,11 +532,13 @@ export type VaultUpdateWithoutItemsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userVaults?: Prisma.UserVaultUpdateManyWithoutVaultNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutVaultsNestedInput
 }
 
 export type VaultUncheckedUpdateWithoutItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -411,11 +552,13 @@ export type VaultCreateWithoutUserVaultsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.ItemCreateNestedManyWithoutVaultInput
+  department?: Prisma.DepartmentCreateNestedOneWithoutVaultsInput
 }
 
 export type VaultUncheckedCreateWithoutUserVaultsInput = {
   id?: string
   name: string
+  departmentId?: string | null
   currentDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -445,15 +588,53 @@ export type VaultUpdateWithoutUserVaultsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.ItemUpdateManyWithoutVaultNestedInput
+  department?: Prisma.DepartmentUpdateOneWithoutVaultsNestedInput
 }
 
 export type VaultUncheckedUpdateWithoutUserVaultsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.ItemUncheckedUpdateManyWithoutVaultNestedInput
+}
+
+export type VaultCreateManyDepartmentInput = {
+  id?: string
+  name: string
+  currentDate?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type VaultUpdateWithoutDepartmentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.ItemUpdateManyWithoutVaultNestedInput
+  userVaults?: Prisma.UserVaultUpdateManyWithoutVaultNestedInput
+}
+
+export type VaultUncheckedUpdateWithoutDepartmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.ItemUncheckedUpdateManyWithoutVaultNestedInput
+  userVaults?: Prisma.UserVaultUncheckedUpdateManyWithoutVaultNestedInput
+}
+
+export type VaultUncheckedUpdateManyWithoutDepartmentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -499,56 +680,70 @@ export type VaultCountOutputTypeCountUserVaultsArgs<ExtArgs extends runtime.Type
 export type VaultSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  departmentId?: boolean
   currentDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   items?: boolean | Prisma.Vault$itemsArgs<ExtArgs>
   userVaults?: boolean | Prisma.Vault$userVaultsArgs<ExtArgs>
+  department?: boolean | Prisma.Vault$departmentArgs<ExtArgs>
   _count?: boolean | Prisma.VaultCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vault"]>
 
 export type VaultSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  departmentId?: boolean
   currentDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  department?: boolean | Prisma.Vault$departmentArgs<ExtArgs>
 }, ExtArgs["result"]["vault"]>
 
 export type VaultSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  departmentId?: boolean
   currentDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  department?: boolean | Prisma.Vault$departmentArgs<ExtArgs>
 }, ExtArgs["result"]["vault"]>
 
 export type VaultSelectScalar = {
   id?: boolean
   name?: boolean
+  departmentId?: boolean
   currentDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type VaultOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "currentDate" | "createdAt" | "updatedAt", ExtArgs["result"]["vault"]>
+export type VaultOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "departmentId" | "currentDate" | "createdAt" | "updatedAt", ExtArgs["result"]["vault"]>
 export type VaultInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   items?: boolean | Prisma.Vault$itemsArgs<ExtArgs>
   userVaults?: boolean | Prisma.Vault$userVaultsArgs<ExtArgs>
+  department?: boolean | Prisma.Vault$departmentArgs<ExtArgs>
   _count?: boolean | Prisma.VaultCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type VaultIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type VaultIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type VaultIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  department?: boolean | Prisma.Vault$departmentArgs<ExtArgs>
+}
+export type VaultIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  department?: boolean | Prisma.Vault$departmentArgs<ExtArgs>
+}
 
 export type $VaultPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Vault"
   objects: {
     items: Prisma.$ItemPayload<ExtArgs>[]
     userVaults: Prisma.$UserVaultPayload<ExtArgs>[]
+    department: Prisma.$DepartmentPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
+    departmentId: string | null
     currentDate: Date
     createdAt: Date
     updatedAt: Date
@@ -948,6 +1143,7 @@ export interface Prisma__VaultClient<T, Null = never, ExtArgs extends runtime.Ty
   readonly [Symbol.toStringTag]: "PrismaPromise"
   items<T extends Prisma.Vault$itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vault$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   userVaults<T extends Prisma.Vault$userVaultsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vault$userVaultsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserVaultPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  department<T extends Prisma.Vault$departmentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Vault$departmentArgs<ExtArgs>>): Prisma.Prisma__DepartmentClient<runtime.Types.Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -979,6 +1175,7 @@ export interface Prisma__VaultClient<T, Null = never, ExtArgs extends runtime.Ty
 export interface VaultFieldRefs {
   readonly id: Prisma.FieldRef<"Vault", 'String'>
   readonly name: Prisma.FieldRef<"Vault", 'String'>
+  readonly departmentId: Prisma.FieldRef<"Vault", 'String'>
   readonly currentDate: Prisma.FieldRef<"Vault", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Vault", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Vault", 'DateTime'>
@@ -1234,6 +1431,10 @@ export type VaultCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extension
    * The data used to create many Vaults.
    */
   data: Prisma.VaultCreateManyInput | Prisma.VaultCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VaultIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1304,6 +1505,10 @@ export type VaultUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extension
    * Limit how many Vaults to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VaultIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1418,6 +1623,25 @@ export type Vault$userVaultsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.UserVaultScalarFieldEnum | Prisma.UserVaultScalarFieldEnum[]
+}
+
+/**
+ * Vault.department
+ */
+export type Vault$departmentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Department
+   */
+  select?: Prisma.DepartmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Department
+   */
+  omit?: Prisma.DepartmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DepartmentInclude<ExtArgs> | null
+  where?: Prisma.DepartmentWhereInput
 }
 
 /**

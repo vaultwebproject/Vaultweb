@@ -31,8 +31,8 @@ export * from "./enums.js"
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more Items
- * const items = await prisma.item.findMany()
+ * // Fetch zero or more Departments
+ * const departments = await prisma.department.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -41,6 +41,11 @@ export const PrismaClient = $Class.getPrismaClientClass()
 export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts extends Prisma.PrismaClientOptions["omit"] = Prisma.PrismaClientOptions["omit"], ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = $Class.PrismaClient<LogOpts, OmitOpts, ExtArgs>
 export { Prisma }
 
+/**
+ * Model Department
+ * 
+ */
+export type Department = Prisma.DepartmentModel
 /**
  * Model Item
  * 
@@ -56,6 +61,11 @@ export type Org = Prisma.OrgModel
  * 
  */
 export type User = Prisma.UserModel
+/**
+ * Model UserDepartment
+ * 
+ */
+export type UserDepartment = Prisma.UserDepartmentModel
 /**
  * Model UserVault
  * 

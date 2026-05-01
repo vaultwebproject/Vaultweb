@@ -317,14 +317,6 @@ export type ItemOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type StringFieldUpdateOperationsInput = {
-  set?: string
-}
-
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
-}
-
 export type ItemCreateNestedManyWithoutVaultInput = {
   create?: Prisma.XOR<Prisma.ItemCreateWithoutVaultInput, Prisma.ItemUncheckedCreateWithoutVaultInput> | Prisma.ItemCreateWithoutVaultInput[] | Prisma.ItemUncheckedCreateWithoutVaultInput[]
   connectOrCreate?: Prisma.ItemCreateOrConnectWithoutVaultInput | Prisma.ItemCreateOrConnectWithoutVaultInput[]

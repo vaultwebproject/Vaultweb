@@ -11,9 +11,14 @@ import { PostSubmitSecret } from "./routes/data/PostSubmitSecret.js";
 import { GetUserData } from "./routes/data/GetUserData.js";
 import { GetSecretByVault } from "./routes/data/GetSecretByVault.js";
 
-import { PostAccount } from "./routes/auth/PostAccount.js";
-const app = new Hono();
+import { GetOrgUsers } from "./routes/org/GetOrgUsers.js";
+import { GetOrgVaults } from "./routes/org/GetOrgVaults.js";
+import { PostCreateVault } from "./routes/org/PostCreateVault.js";
+import { PostAddUserToVault } from "./routes/users/PostAddUserToVault.js";
+import { DeleteUserVaultAccess } from "./routes/users/DeleteUserVaultAccess.js";
+import { PatchDeactivateVault } from "./routes/vault/PatchDeactivateVault.js";
 
+const app = new Hono();
 
 app.use(cors({ origin: "http://localhost:5173" })); // Enable CORS for requests from the frontend running on localhost:5173
 
@@ -29,13 +34,19 @@ const openapi = fromHono(app);
 openapi.get("/org/:orgId/vaults/:vaultId", GetVaultById);
 openapi.post("/auth/login", PostLogin); // PostLogin route to the OpenAPI router
 openapi.get("/users/:userId", GetUserById);
+
 openapi.post("/data/submit", PostSubmitSecret);
 openapi.get("/data/:userId", GetUserData);
 openapi.get("/data/vault/:vaultId", GetSecretByVault);
 
-openapi.post("/createAccount", PostAccount); // Matches your netUtilities call
-openapi.post("/auth/login", PostLogin);
-openapi.get("/users/:userId", GetUserById);
+openapi.get("/org/:orgId/users", GetOrgUsers);
+openapi.get("/org/:orgId/vaults", GetOrgVaults);
+openapi.post("/org/:orgId/vaults", PostCreateVault);
+
+openapi.post("/users/:userId/vaults", PostAddUserToVault);
+openapi.delete("/users/:userId/vaults/:vaultId", DeleteUserVaultAccess);
+
+openapi.patch("/vaults/:vaultId/deactivate", PatchDeactivateVault);
 
 serve(
   {

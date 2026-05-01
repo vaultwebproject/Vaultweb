@@ -51,9 +51,11 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  Department: 'Department',
   Item: 'Item',
   Org: 'Org',
   User: 'User',
+  UserDepartment: 'UserDepartment',
   UserVault: 'UserVault',
   Vault: 'Vault'
 } as const
@@ -69,6 +71,17 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+export const DepartmentScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  orgId: 'orgId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DepartmentScalarFieldEnum = (typeof DepartmentScalarFieldEnum)[keyof typeof DepartmentScalarFieldEnum]
 
 
 export const ItemScalarFieldEnum = {
@@ -104,6 +117,17 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const UserDepartmentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  departmentId: 'departmentId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserDepartmentScalarFieldEnum = (typeof UserDepartmentScalarFieldEnum)[keyof typeof UserDepartmentScalarFieldEnum]
+
+
 export const UserVaultScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -122,6 +146,7 @@ export type UserVaultScalarFieldEnum = (typeof UserVaultScalarFieldEnum)[keyof t
 export const VaultScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  departmentId: 'departmentId',
   currentDate: 'currentDate',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -136,4 +161,12 @@ export const SortOrder = {
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
