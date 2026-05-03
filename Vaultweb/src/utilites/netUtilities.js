@@ -66,3 +66,56 @@ export const retrieveSecretByVault = async (vaultID) => {
     return items;
 }
 
+export const retrieveOrgUsers = async (orgId) => {
+    const res = await axios.get(`http://localhost:3000/org/${orgId}/users`);
+    return res.data;
+}
+
+export const retrieveOrgVaults = async (orgId) => {
+    const res = await axios.get(`http://localhost:3000/org/${orgId}/vaults`);
+    return res.data;
+}
+
+export const createVault = async (orgId, name, ownerUserId, wrappedKey) => {
+    try {
+        const result = await axios.post(`http://localhost:3000/org/${orgId}/vaults`, {
+            name,
+            ownerUserId,
+            wrappedKey,
+        });
+        return result.data;
+    } catch (err) {
+        console.error("Post failed");
+    }
+}
+
+export const addUserToVault = async (userId, vaultId, wrappedKey) => {
+    try {
+        const result = await axios.post(`http://localhost:3000/users/${userId}/vaults`, {
+            vaultId,
+            wrappedKey,
+        });
+        return result.data;
+    } catch (err) {
+        console.error("Post failed");
+    }
+}
+
+export const removeUserFromVault = async (userId, vaultId) => {
+    try {
+        const result = await axios.delete(`http://localhost:3000/users/${userId}/vaults/${vaultId}`);
+        return result.data;
+    } catch (err) {
+        console.error("Delete failed");
+    }
+}
+
+export const deactivateVault = async (vaultId) => {
+    try {
+        const result = await axios.patch(`http://localhost:3000/vaults/${vaultId}/deactivate`);
+        return result.data;
+    } catch (err) {
+        console.error("Patch failed");
+    }
+}
+
