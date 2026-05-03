@@ -11,7 +11,7 @@ const UserProvider = props => {
     return (
         <Context.UserProvider value={{userName, setUserName, uuID, setuuID, userKey, setUserKey, privateKey, setPrivateKey}}>
             {props.children}
-        </UserContext.Provider>
+        </Context.UserProvider>
     );
 }
 
