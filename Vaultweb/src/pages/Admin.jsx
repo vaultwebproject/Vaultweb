@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Users, Activity, ShieldCheck, UserPlus, MoreVertical, Search,FileText } from 'lucide-react';
 import { UserContext } from '../UserContext';
 import { retrieveOrgUsers, retrieveOrgVaults, createVault, addUserToVault, removeUserFromVault, deactivateVault
-} from '../utilities/netUtilities';
+} from '../utilites/netUtilities';
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState('users');
@@ -24,7 +24,7 @@ const Admin = () => {
   ];
 
   // get orgId from shared context so page knows which organisation to load
-  const { orgId } = useContext(UserContext);
+  const { orgId, uuID, userKey } = useContext(UserContext);
 
   // load users and vaults from backend for the current organisation
   const loadOrganisationData = async () => {
@@ -54,9 +54,11 @@ const Admin = () => {
 
   // handler for creating a new vault
   const handleCreateVault = async () => {
-    if (!newVaultName.trim() || !orgId) return;
+    if (!newVaultName.trim() || !orgId || !uuID) return;
 
-    const result = await createVault(orgId, newVaultName.trim());
+    const wrappedKey = userKey || "temporary_wrapped_key";
+
+    const result = await createVault(orgId, newVaultName.trim(), uuID, wrappedKey);
     if (result) {
       setNewVaultName("");
       await loadOrganisationData();
@@ -67,7 +69,14 @@ const Admin = () => {
   const handleAddUserToVault = async () => {
     if (!selectedUserId || !selectedVaultId) return;
 
-    const result = await addUserToVault(selectedUserId, selectedVaultId);
+    const wrappedKey = userKey || "temporary_wrapped_key";
+
+    const result = await addUserToVault(
+      selectedUserId,
+      selectedVaultId,
+      wrappedKey
+    );
+
     if (result) {
       setSelectedUserId("");
       setSelectedVaultId("");

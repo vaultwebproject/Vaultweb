@@ -9,9 +9,9 @@ const UserProvider = props => {
     const [orgId, setOrgId] = useState("");
 
     return (
-        <Context.UserProvider value={{userName, setUserName, uuID, setuuID, userKey, setUserKey, orgId, setOrgId}}>
+        <UserContext.Provider value={{userName, setUserName, uuID, setuuID, userKey, setUserKey, orgId, setOrgId}}>
             {props.children}
-        </Context.UserProvider>
+        </UserContext.Provider>
     );
 }
 

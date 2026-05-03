@@ -4,19 +4,35 @@ import { Link } from 'react-router-dom';
 import { createMasterKey } from '../utilites/cryptoUtilities';
 import { submitLogin, retriveUserInfo } from '../utilites/netUtilities';
 import { useContext } from 'react';
-import UserProvider from "../UserContext";
+import { UserContext } from "../UserContext";
+import { useNavigate } from 'react-router-dom';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState("");
-  const userInfo = useContext(UserProvider);
+  const navigate = useNavigate();
+  const { setuuID, setOrgId, setUserName } = useContext(UserContext);
 
   const handleSignIn = async (e) => {
     e.preventDefault();
     console.log("Initiating secure session for:", email);
+
     const result = await submitLogin(email, password);
+
     if (result?.confirm === true) {
       const userData = await retriveUserInfo(result.id);
+
+      if (userData?.success && userData?.result?.user) {
+        const user = userData.result.user;
+
+        setuuID(user.id);
+        setOrgId(user.orgId);
+        setUserName(user.email);
+
+        console.log("Logged in user:", user);
+
+        navigate("/admin");
+      }
     }
   };
 
