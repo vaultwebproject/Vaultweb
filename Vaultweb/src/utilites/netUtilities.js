@@ -4,18 +4,14 @@ import { encryptData, decryptData } from './cryptoUtilities';
 import {sha1,sha256,sha384,sha512} from 'crypto-hash';
 
 export const submitAccount = async(email, role, password, organisation) => {
-    const submission = new FormData();
-
     const passHash = await sha256(password);
 
-    submission.append("email", email);
-    submission.append("role", role);
-    submission.append("passHash", passHash);
-    submission.append("organisation", organisation);
-
     try{
-        //Insert backend address here
-        const result = await axios.post("http://localhost:3000/createAccount", submission);
+        const result = await axios.post("http://localhost:3000/auth/register", {
+            email,
+            passHash,
+            organisationName: organisation,
+        });
         return result;
     } catch (err) {
         console.error("Post failed");
@@ -51,17 +47,17 @@ export const submitSecret = async (key, data, userID, vaultID, name, iv) => {
     }
 }
 
-export const retriveUserInfo = async (userID) => {
+export const retrieveUserInfo = async (userID) => {
     const res = await axios.get(`http://localhost:3000/users/${userID}`);
     return res.data;
 }
 
-export const retriveUserSecrets = async (userID) => {
+export const retrieveUserSecrets = async (userID) => {
     const res = await axios.get(`http://localhost:3000/data/${userID}`);
     return res.data;
 }
 
-export const retriveSecretByVault = async (vaultID) => {
+export const retrieveSecretByVault = async (vaultID) => {
     const res = await axios.get(`http://localhost:3000/data/vault/${vaultID}`);
     const items = res.data.result.items.map((item) => {
         const { iv, submissionData } = JSON.parse(item.submissionData);

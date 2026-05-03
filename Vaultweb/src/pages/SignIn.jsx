@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { Lock, Mail, ArrowRight, ShieldCheck, Github } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createMasterKey } from '../utilites/cryptoUtilities';
-import { submitLogin, retriveUserInfo } from '../utilites/netUtilities';
+import { submitLogin, retrieveUserInfo } from '../utilites/netUtilities';
 import { useContext } from 'react';
-import UserProvider from "../UserContext";
+import { UserContext } from "../UserContext";
 import { useNavigate } from 'react-router-dom';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState("");
-  const userInfo = useContext(UserProvider);
+  const userInfo = useContext(UserContext);
   const navigate = useNavigate();
 
   const handleSignIn = async (e) => {
@@ -18,12 +18,15 @@ const SignIn = () => {
     console.log("Initiating secure session for:", email);
     const result = await submitLogin(email, password);
     if (result?.confirm === true) {
-      const userData = await retriveUserInfo(result.id);
-      if (userData != null){
-        userInfo.setUserName(userData.userName);
-        userInfo.setuuID(userData.uuID);
-        userInfo.setUserKey(createMasterKey(email, password));
-        localStorage.setItem('token', userInfo.token);
+      const userData = await retrieveUserInfo(result.id);
+      if (userData?.success) {
+        const user = userData.result.user;
+        userInfo.setUserName(user.email);
+        userInfo.setuuID(user.id);
+        userInfo.setOrgId(user.orgId);
+        const key = await createMasterKey(email, password);
+        userInfo.setUserKey(key);
+        localStorage.setItem('vault_user_id', user.id);
         navigate('/vault');
       }
     }

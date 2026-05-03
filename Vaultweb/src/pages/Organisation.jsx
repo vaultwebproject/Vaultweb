@@ -21,17 +21,17 @@ const Organization = () => {
       try {
         const response = await retrieveUserInfo(currentUserID);
         
-        if (response.confirm) {
-          // Mapping backend Prisma names to frontend display names
+        if (response.success) {
+          const user = response.result.user;
           setOrgData({
-            name: response.organisation?.name || "Unknown Organization",
-            id: response.organisation?.id || "N/A",
+            name: user.org?.name || "Unknown Organization",
+            id: user.org?.id || "N/A",
             tier: "Enterprise", 
             region: "AU-South (Swinburne Node)",
             publicKey: "rsa-4096-7b2...vault_api_key_99af", 
             shardCount: 1242
           });
-          setUserRole(response.role || 'Member');
+          setUserRole(user.role || 'Member');
         }
       } catch (err) {
         console.error("Initialization failed:", err);

@@ -1,4 +1,4 @@
-import React, { use, useContext, useState } from "react";
+import React, { useState } from "react";
 
 export const UserContext = React.createContext();
 
@@ -7,11 +7,12 @@ const UserProvider = props => {
     const [userKey, setUserKey] = useState("");
     const [uuID, setuuID] = useState("");
     const [privateKey, setPrivateKey] = useState("");
+    const [orgId, setOrgId] = useState("");
 
     return (
-        <Context.UserProvider value={{userName, setUserName, uuID, setuuID, userKey, setUserKey, privateKey, setPrivateKey}}>
+        <UserContext.Provider value={{userName, setUserName, uuID, setuuID, userKey, setUserKey, privateKey, setPrivateKey, orgId, setOrgId}}>
             {props.children}
-        </Context.UserProvider>
+        </UserContext.Provider>
     );
 }
 

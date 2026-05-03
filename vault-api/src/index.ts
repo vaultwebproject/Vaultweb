@@ -6,6 +6,7 @@ import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { fromHono } from "chanfana";
 import { GetVaultById } from "./routes/vault/GetVaultById.js";
 import { PostLogin } from "./routes/auth/PostLogin.js";
+import { PostRegister } from "./routes/auth/PostRegister.js";
 import { GetUserById } from "./routes/users/GetUserById.js";
 import { PostSubmitSecret } from "./routes/data/PostSubmitSecret.js";
 import { GetUserData } from "./routes/data/GetUserData.js";
@@ -33,6 +34,7 @@ const openapi = fromHono(app);
 
 openapi.get("/org/:orgId/vaults/:vaultId", GetVaultById);
 openapi.post("/auth/login", PostLogin); // PostLogin route to the OpenAPI router
+openapi.post("/auth/register", PostRegister);
 openapi.get("/users/:userId", GetUserById);
 
 openapi.post("/data/submit", PostSubmitSecret);

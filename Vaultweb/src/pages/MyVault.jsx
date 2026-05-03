@@ -1,52 +1,68 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Lock, Eye, EyeOff, Search, Plus, Trash2, Copy, ShieldCheck} from "lucide-react";
 import { decryptData } from "../utilites/cryptoUtilities";
-import { retriveSecretByVault, retriveUserSecrets } from "../utilites/netUtilities";
-import UserProvider from "../UserContext";
+import { retrieveUserSecrets } from "../utilites/netUtilities";
+import { UserContext } from "../UserContext";
+import { logEvent, LOG_ACTIONS, SEVERITY } from "../utilites/auditLogger";
 
 const MyVault = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [decryptedId, setDecryptedId] = useState(null);
-  const userInfo = useContext(UserProvider);
+  const { uuID, userKey, userName } = useContext(UserContext);
   const [vaultItems, setVaultItems] = useState([]);
 
   useEffect(() => {
-    async () => {
-      const result = retriveUserSecrets(userInfo.uuID);
-      const decrypted = [];
-      for (items in result) {
-        const plainText = await decryptData(item.submissionData, userInfo.userKey, item.iv);
-        decrypted.push({ ...item, submissionData: plainText });
+    (async () => {
+      try {
+        const response = await retrieveUserSecrets(uuID);
+        const allItems = [];
+        for (const uv of (response.result?.userVaults || [])) {
+          for (const item of (uv.vault?.items || [])) {
+            const parsed = JSON.parse(item.submissionData);
+            const ivBytes = Uint8Array.from(atob(parsed.iv), c => c.charCodeAt(0));
+            const cipherBuffer = Uint8Array.from(atob(parsed.submissionData), c => c.charCodeAt(0)).buffer;
+            const plainText = await decryptData(cipherBuffer, userKey, ivBytes);
+            allItems.push({ ...item, submissionData: plainText });
+          }
+        }
+        setVaultItems(allItems);
+      } catch (err) {
+        console.error("Failed to load vault secrets:", err);
       }
-      setVaultItems(decrypted);
-    }
+    })();
   }, []);
   
   const handleCopy = async (item) => {
     try {
-      await navigator.clipboard.writeText(item.value);
+      await navigator.clipboard.writeText(item.submissionData);
     } catch {
       /* clipboard not available */
     }
-    await logEvent({
-      action:   LOG_ACTIONS.SECRET_COPIED,
-      userId,
-      userName,
-      target:   item.name,
-      details:  `Category: ${item.category}`,
-      severity: SEVERITY.INFO,
-    });
+    try {
+      await logEvent({
+        action:   LOG_ACTIONS.SECRET_COPIED,
+        userId:   uuID,
+        userName,
+        target:   item.name,
+        severity: SEVERITY.INFO,
+      });
+    } catch {
+      /* audit logger not fully connected */
+    }
   };
 
   const handleDelete = async (item) => {
-    await logEvent({
-      action:   LOG_ACTIONS.SECRET_DELETED,
-      userId,
-      userName,
-      target:   item.name,
-      details:  `Category: ${item.category}`,
-      severity: SEVERITY.WARN,
-    });
+    try {
+      await logEvent({
+        action:   LOG_ACTIONS.SECRET_DELETED,
+        userId:   uuID,
+        userName,
+        target:   item.name,
+        severity: SEVERITY.WARN,
+      });
+    } catch {
+      /* audit logger not fully connected */
+    }
   };
 
   // Mock Data: In reality, 'value' would be an Encrypted Blob from your DB
@@ -135,12 +151,13 @@ const MyVault = () => {
                         </div>
                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
                           <button
+                            onClick={() => handleCopy(item)}
                             className="p-2.5 hover:bg-sky-100 rounded-lg text-slate-400 hover:text-sky-600 transition-all"
                             title="Copy"
                           >
                             <Copy size={18} />
                           </button>
-                          <button className="p-2.5 hover:bg-red-50 rounded-lg text-slate-400 hover:text-red-500 transition-all">
+                          <button onClick={() => handleDelete(item)} className="p-2.5 hover:bg-red-50 rounded-lg text-slate-400 hover:text-red-500 transition-all">
                               <Trash2 size={18} />
                           </button>
                         </div>

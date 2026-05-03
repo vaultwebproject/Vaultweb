@@ -5,10 +5,11 @@ const textDecoder = new TextDecoder();
 // Creates a Master Key for a user (Symmetric Key Encryption) based on their password and a salt value. For use with encrypting and decrypting user's data.
 export const createMasterKey = async (source, salt) => {
     const sourceBuffer = textEncoder.encode(source);
+    const saltBuffer = typeof salt === 'string' ? textEncoder.encode(salt) : salt;
 
     const sourceKey = await window.crypto.subtle.importKey("raw", sourceBuffer, {name: "PBKDF2"}, false, ["deriveKey"])
 
-    const derivedKey = await window.crypto.subtle.deriveKey({name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256"}, sourceKey, {name: "AES-GCM", length: 256}, true, ["encrypt", "decrypt"]);
+    const derivedKey = await window.crypto.subtle.deriveKey({name: "PBKDF2", salt: saltBuffer, iterations: 100000, hash: "SHA-256"}, sourceKey, {name: "AES-GCM", length: 256}, true, ["encrypt", "decrypt"]);
 
     return derivedKey;
 };
@@ -57,10 +58,15 @@ export const decryptDataPublic = async (cipherText, key) => {
     return(plainText);
 };
 
-export const encryptBase64 = async (plainText) => {
-    
+export const encryptBase64 = async (buffer) => {
+    return btoa(String.fromCharCode(...new Uint8Array(buffer)));
 }
 
-export const decryptBase64 = async (cipherText) => {
-    
+export const decryptBase64 = async (base64String) => {
+    const binary = atob(base64String);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes.buffer;
 }

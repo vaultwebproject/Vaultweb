@@ -25,6 +25,12 @@ export class GetUserById extends OpenAPIRoute {
         role: true,
         orgId: true,
         createdAt: true,
+        org: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
