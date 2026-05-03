@@ -4,7 +4,6 @@ import {
   Globe, Copy, ShieldAlert, Server, Zap, Loader2, Check
 } from 'lucide-react';
 
-// Fixed the typo in the import path and included retrieveUserInfo
 import { retrieveUserInfo } from "../utilites/netUtilities"; 
 
 const Organization = () => {
@@ -15,7 +14,6 @@ const Organization = () => {
 
   useEffect(() => {
     const initializeOrgPage = async () => {
-      // In a real app, you'd get the current userID from your Auth Context or LocalStorage
       const currentUserID = localStorage.getItem("vault_user_id") || "default_id";
       
       try {

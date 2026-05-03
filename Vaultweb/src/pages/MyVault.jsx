@@ -36,7 +36,6 @@ const MyVault = () => {
     try {
       await navigator.clipboard.writeText(item.submissionData);
     } catch {
-      /* clipboard not available */
     }
     try {
       await logEvent({
@@ -64,8 +63,6 @@ const MyVault = () => {
       /* audit logger not fully connected */
     }
   };
-
-  // Mock Data: In reality, 'value' would be an Encrypted Blob from your DB
 
   return (
     <div className="min-h-screen bg-transparent text-slate-800 font-[Poppins] pt-24 pb-12 px-6">

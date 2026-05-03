@@ -10,10 +10,9 @@ const SignUp = () => {
   const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
-    e.preventDefault(); // Fixed: Prevent page refresh
+    e.preventDefault();
     
     try {
-      // Fixed: Properly handling the response from your utility
       const result = await submitAccount(email, "", password, organisation);
       console.log("Account provisioned:", result);
       navigate("/signin");
