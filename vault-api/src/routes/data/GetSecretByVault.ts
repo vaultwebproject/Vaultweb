@@ -17,16 +17,13 @@ export class GetSecretByVault extends OpenAPIRoute {
     const data = await this.getValidatedData<typeof this.schema>();
     const prisma = prismaClient(c);
 
-    const vault = await prisma.vault.findUnique({
+    const items = await prisma.item.findMany({
       where: {
-        id: data.params.vaultId,
-      },
-      include: {
-        items: true,
+        vaultId: data.params.vaultId,
       },
     });
 
-    if (!vault) {
+    if (items.length === 0) {
       return c.json(
         { success: false, error: "Vault not found" },
         404
@@ -36,7 +33,7 @@ export class GetSecretByVault extends OpenAPIRoute {
     return c.json({
       success: true,
       result: {
-        vault,
+        items,
       },
     });
   }

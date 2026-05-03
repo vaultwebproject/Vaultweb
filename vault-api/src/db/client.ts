@@ -9,9 +9,9 @@ const dbPath = path.resolve(__dirname, "../../dev.db");
 
 console.log("DB path:", dbPath);
 
-export function prismaClient(_c: AppContext) {
-  const adapter = new PrismaBetterSqlite3({ url: dbPath });
-  const prisma = new PrismaClient({ adapter });
+const adapter = new PrismaBetterSqlite3({ url: dbPath });
+const prisma = new PrismaClient({ adapter });
 
+export function prismaClient(_c: AppContext) {
   return prisma;
 }

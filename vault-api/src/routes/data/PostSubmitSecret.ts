@@ -12,6 +12,7 @@ export class PostSubmitSecret extends OpenAPIRoute {
           "application/json": {
             schema: z.object({
               userID: z.uuidv7(),
+              vaultID: z.string(),
               name: z.string().min(1),
               submissionData: z.string().min(1),
               iv: z.string().min(1),
@@ -24,25 +25,10 @@ export class PostSubmitSecret extends OpenAPIRoute {
 
   async handle(c: AppContext) {
     const data = await this.getValidatedData<typeof this.schema>();
-    const { userID, name, submissionData, iv } = data.body;
+    const { userID, vaultID, name, submissionData, iv } = data.body;
 
     const prisma = prismaClient(c);
 
-    const userVault = await prisma.userVault.findFirst({
-      where: {
-        userId: userID,
-      },
-      select: {
-        vaultId: true,
-      },
-    });
-
-    if (!userVault) {
-      return c.json(
-        { success: false, error: "No vault found for this user" },
-        404
-      );
-    }
 
     const storedSubmissionData = JSON.stringify({
       iv,
@@ -53,7 +39,7 @@ export class PostSubmitSecret extends OpenAPIRoute {
       data: {
         name,
         submissionData: storedSubmissionData,
-        vaultId: userVault.vaultId,
+        vaultId: vaultID,
       },
     });
 
