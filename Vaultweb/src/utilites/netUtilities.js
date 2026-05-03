@@ -62,11 +62,68 @@ export const retriveUserSecrets = async (userID) => {
 }
 
 export const retriveSecretByVault = async (vaultID) => {
-    const res = await axios.get(`http://localhost:3000/data/vault/${vaultID}`);
-    const items = res.data.result.items.map((item) => {
-        const { iv, submissionData } = JSON.parse(item.submissionData);
-        return { ...item, iv, submissionData };
-    });
-    return items;
+    const res = await axios.get(`http://localhost:3000/data/${vaultID}`);
+    return res.data;
 }
 
+
+// get all users in an organisation
+export const retrieveOrgUsers = async (orgId) => {
+    try {
+        const res = await axios.get(`http://localhost:3000/org/${orgId}/users`);
+        return res.data;
+    } catch (err) {
+        console.error("Failed to retrieve organisation users", err);
+        return null;
+    }
+};
+// get all vaults in an organisation
+export const retrieveOrgVaults = async (orgId) => {
+    try {
+        const res = await axios.get(`http://localhost:3000/org/${orgId}/vaults`);
+        return res.data;
+    } catch (err) {
+        console.error("Failed to retrieve organisation vaults", err);
+        return null;
+    }
+};
+// create a new vault inside an organisation
+export const createVault = async (orgId, name) => {
+    try {
+        const res = await axios.post(`http://localhost:3000/org/${orgId}/vaults`, { name });
+        return res.data;
+    } catch (err) {
+        console.error("Failed to create vault", err);
+        return null;
+    }
+};
+// assign a user to a vault
+export const addUserToVault = async (userId, vaultId) => {
+    try {
+        const res = await axios.post(`http://localhost:3000/users/${userId}/vaults`, { vaultId });
+        return res.data;
+    } catch (err) {
+        console.error("Failed to add user to vault", err);
+        return null;
+    }
+};
+// remove a user’s access from a vault
+export const removeUserFromVault = async (userId, vaultId) => {
+    try {
+        const res = await axios.delete(`http://localhost:3000/users/${userId}/vaults/${vaultId}`);
+        return res.data;
+    } catch (err) {
+        console.error("Failed to remove user from vault", err);
+        return null;
+    }
+};
+// deactivate a vault
+export const deactivateVault = async (vaultId) => {
+    try {
+        const res = await axios.patch(`http://localhost:3000/vaults/${vaultId}/deactivate`);
+        return res.data;
+    } catch (err) {
+        console.error("Failed to deactivate vault", err);
+        return null;
+    }
+};
