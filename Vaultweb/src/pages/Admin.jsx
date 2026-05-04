@@ -23,7 +23,7 @@ const Admin = () => {
     { id: 1, action: "System Logs Placeholder", user: "N/A", target: "N/A", time: "Pending backend route" },
   ];
 
-  // get orgId from shared context so page knows which organisation to load
+  // get orgId, user ID, and master key from shared context
   const { orgId, uuID, userKey } = useContext(UserContext);
 
   // load users and vaults from backend for the current organisation
@@ -54,9 +54,21 @@ const Admin = () => {
 
   // handler for creating a new vault
   const handleCreateVault = async () => {
-    if (!newVaultName.trim() || !orgId || !uuID) return;
+    if (!newVaultName.trim() || !orgId || !userKey) return;
 
-    const wrappedKey = userKey || "temporary_wrapped_key";
+    // Generate a unique AES-256 symmetric key for this vault
+    const vaultKey = await window.crypto.subtle.generateKey(
+      { name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]
+    );
+    const rawKey = await window.crypto.subtle.exportKey("raw", vaultKey);
+
+    // Wrap (encrypt) the vault key with the admin's master key
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    const encrypted = await window.crypto.subtle.encrypt(
+      { name: "AES-GCM", iv }, userKey, rawKey
+    );
+    // Store as base64( iv || ciphertext )
+    const wrappedKey = btoa(String.fromCharCode(...iv, ...new Uint8Array(encrypted)));
 
     const result = await createVault(orgId, newVaultName.trim(), uuID, wrappedKey);
     if (result) {
@@ -64,19 +76,21 @@ const Admin = () => {
       await loadOrganisationData();
     }
   };
-
-  // handler for assigning a user to a vault
+  
   const handleAddUserToVault = async () => {
-    if (!selectedUserId || !selectedVaultId) return;
+    if (!selectedUserId || !selectedVaultId || !userKey) return;
 
-    const wrappedKey = userKey || "temporary_wrapped_key";
-
-    const result = await addUserToVault(
-      selectedUserId,
-      selectedVaultId,
-      wrappedKey
+    const tempVaultKey = await window.crypto.subtle.generateKey(
+      { name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]
     );
+    const rawKey = await window.crypto.subtle.exportKey("raw", tempVaultKey);
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    const encrypted = await window.crypto.subtle.encrypt(
+      { name: "AES-GCM", iv }, userKey, rawKey
+    );
+    const wrappedKey = btoa(String.fromCharCode(...iv, ...new Uint8Array(encrypted)));
 
+    const result = await addUserToVault(selectedUserId, selectedVaultId, wrappedKey);
     if (result) {
       setSelectedUserId("");
       setSelectedVaultId("");
