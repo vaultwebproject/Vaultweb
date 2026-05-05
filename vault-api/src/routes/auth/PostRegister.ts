@@ -13,7 +13,9 @@ export class PostRegister extends OpenAPIRoute {
             schema: z.object({
               email: z.string().email(),
               passHash: z.string(),
-              organisationName: z.string().min(1),
+              publicKey: z.string(),
+              encryptedPrivateKey: z.string(),
+              salt: z.string(),
             }),
           },
         },
@@ -23,7 +25,7 @@ export class PostRegister extends OpenAPIRoute {
 
   async handle(c: AppContext) {
     const data = await this.getValidatedData<typeof this.schema>();
-    const { email, passHash, organisationName } = data.body;
+    const { email, passHash, publicKey, encryptedPrivateKey, salt } = data.body;
 
     const prisma = prismaClient(c);
 
@@ -42,8 +44,11 @@ export class PostRegister extends OpenAPIRoute {
       data: {
         email,
         passwordHash: passHash,
-        role: "ORG_USER",
-        orgId: org.id,
+        publicKey,
+        encryptedPrivateKey,
+        salt,
+        role: UserRole.ORG_USER,
+        orgId: undefined,
       },
     });
 

@@ -58,15 +58,42 @@ export const decryptDataPublic = async (cipherText, key) => {
     return(plainText);
 };
 
-export const encryptBase64 = async (buffer) => {
-    return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+export const encryptBase64 = async (plainText) => {
+
 }
 
-export const decryptBase64 = async (base64String) => {
-    const binary = atob(base64String);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-        bytes[i] = binary.charCodeAt(i);
-    }
-    return bytes.buffer;
+export const decryptBase64 = async (cipherText) => {
+
 }
+
+// Exports a public CryptoKey to a base64 string for sending to the backend DB.
+export const exportPublicKey = async (publicKey) => {
+    const exported = await window.crypto.subtle.exportKey("spki", publicKey);
+    const bytes = new Uint8Array(exported);
+    return btoa(String.fromCharCode(...bytes));
+};
+
+// Generates a random salt for master key derivation.
+export const generateSalt = () => {
+    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+    return btoa(String.fromCharCode(...salt));
+};
+
+// Encrypts the private RSA key with the master key for backend DB.
+export const encryptPrivateKey = async (privateKey, masterKey) => {
+    const exported = await window.crypto.subtle.exportKey("pkcs8", privateKey);
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    const encrypted = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv }, masterKey, exported);
+    const ivBase64 = btoa(String.fromCharCode(...iv));
+    const dataBase64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+    return `${ivBase64}.${dataBase64}`;
+};
+
+// Decrypts the encryptedPrivateKey from the server back into a usable CryptoKey.
+export const decryptPrivateKey = async (encryptedPrivateKey, masterKey) => {
+    const [ivBase64, dataBase64] = encryptedPrivateKey.split(".");
+    const iv = Uint8Array.from(atob(ivBase64), c => c.charCodeAt(0));
+    const data = Uint8Array.from(atob(dataBase64), c => c.charCodeAt(0));
+    const decrypted = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv }, masterKey, data);
+    return window.crypto.subtle.importKey("pkcs8", decrypted, { name: "RSA-OAEP", hash: "SHA-256" }, true, ["decrypt"]);
+};

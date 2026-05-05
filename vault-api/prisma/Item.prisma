@@ -1,3 +1,4 @@
+
 model Item {
   id             String   @id @unique @default(uuid(7))
   name           String

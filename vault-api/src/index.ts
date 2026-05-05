@@ -33,8 +33,8 @@ app.get("/", (c) => {
 const openapi = fromHono(app);
 
 openapi.get("/org/:orgId/vaults/:vaultId", GetVaultById);
-openapi.post("/auth/login", PostLogin); // PostLogin route to the OpenAPI router
-openapi.post("/auth/register", PostRegister);
+openapi.post("/auth/login", PostLogin);
+openapi.post("/createAccount", PostRegister); // PostLogin route to the OpenAPI router
 openapi.get("/users/:userId", GetUserById);
 
 openapi.post("/data/submit", PostSubmitSecret);
