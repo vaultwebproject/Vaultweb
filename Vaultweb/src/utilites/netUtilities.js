@@ -1,22 +1,18 @@
 import React from 'react';
 import axios from 'axios';
-import { encryptData, decryptData, exportPublicKey, createKeyPair, generateSalt, encryptPrivateKey, decryptPrivateKey, createMasterKey } from './cryptoUtilities';
-
-let sessionPrivateKey = null;
-export const getSessionPrivateKey = () => sessionPrivateKey;
+import { encryptData, decryptData } from './cryptoUtilities';
 import {sha1,sha256,sha384,sha512} from 'crypto-hash';
 
-export const submitAccount = async(email, password) => {
+export const submitAccount = async(email, role, password, organisation) => {
     const passHash = await sha256(password);
-    const saltBase64 = generateSalt();
-    const saltBytes = Uint8Array.from(atob(saltBase64), c => c.charCodeAt(0));
-    const masterKey = await createMasterKey(password, saltBytes);
-    const keyPair = await createKeyPair();
-    const publicKey = await exportPublicKey(keyPair.publicKey);
-    const encryptedPrivKey = await encryptPrivateKey(keyPair.privateKey, masterKey);
-    try {
-        const result = await axios.post("http://localhost:3000/createAccount", { email, passHash, publicKey, encryptedPrivateKey: encryptedPrivKey, salt: saltBase64 });
-        return result.data;
+
+    try{
+        const result = await axios.post("http://localhost:3000/auth/register", {
+            email,
+            passHash,
+            organisationName: organisation,
+        });
+        return result;
     } catch (err) {
         console.error("Post failed");
     }
@@ -25,13 +21,7 @@ export const submitAccount = async(email, password) => {
 export const submitLogin = async(email, password) => {
     const passHash = await sha256(password);
     try{
-        const result = await axios.post("http://localhost:3000/auth/login", { email, passHash });
-        const { confirm, encryptedPrivateKey, salt } = result.data;
-        if (confirm && encryptedPrivateKey && salt) {
-            const saltBytes = Uint8Array.from(atob(salt), c => c.charCodeAt(0));
-            const masterKey = await createMasterKey(password, saltBytes);
-            sessionPrivateKey = await decryptPrivateKey(encryptedPrivateKey, masterKey);
-        }
+        const result = await axios.post("http://localhost:3000/auth/login", { email, passHash }); // Routes are defined in VaultWeb_Project_B\vault-api\src\index.ts. Then created in routes/auth/PostLogin.ts
         return result.data;
     } catch (err) {
         console.error("Post failed");

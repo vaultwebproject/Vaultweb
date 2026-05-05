@@ -1,12 +1,5 @@
 // A user having a UserVault row means they have access to the vault. Vaults are all owned by the org not the user.
 
-enum VaultRole {
-    OWNER
-    ADMIN
-    MEMBER
-    VIEWER
-}
-
 model UserVault {
   id      String @id @unique @default(uuid(7))
   userId  String
@@ -14,8 +7,7 @@ model UserVault {
   user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   vault   Vault  @relation(fields: [vaultId], references: [id], onDelete: Cascade)
 
-    // Permissions
-  vaultRole  VaultRole @default(VIEWER)
+  // Permissions
   permCanCreateItems         Boolean @default(false)
   permCanRemoveUserFromVault Boolean @default(false)
   permCanAddUserFromVault    Boolean @default(false)

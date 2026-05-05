@@ -44,8 +44,6 @@ export class PostLogin extends OpenAPIRoute {
       return c.json({ confirm: false }, 401);
     }
 
-    return c.json({ confirm: true, id: user.id, encryptedPrivateKey: user.encryptedPrivateKey, salt: user.salt });
+    return c.json({ confirm: true, id: user.id });
   }
 }
-
-

@@ -50,7 +50,7 @@ export class PostRegister extends OpenAPIRoute {
       data: {
         email,
         passwordHash: passHash,
-        role: UserRole.ORG_USER,
+        role: "ORG_USER",
         orgId: org.id,
       },
     });
