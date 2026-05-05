@@ -62,6 +62,20 @@ export const retriveSecretByVault = async (vaultID) => {
     return res.data;
 }
 
+export const submitAuditLog = async (entry) => {
+    console.log("submitAuditLog placeholder", entry);
+    return null;
+};
+
+export const fetchAuditLogs = async () => {
+    console.log("fetchAuditLogs placeholder");
+    return [];
+};
+
+export const deleteAuditLogs = async () => {
+    console.log("deleteAuditLogs placeholder");
+    return null;
+};
 
 // get all users in an organisation
 export const retrieveOrgUsers = async (orgId) => {
@@ -84,9 +98,13 @@ export const retrieveOrgVaults = async (orgId) => {
     }
 };
 // create a new vault inside an organisation
-export const createVault = async (orgId, name) => {
+export const createVault = async (orgId, name, ownerUserId, wrappedKey) => {
     try {
-        const res = await axios.post(`http://localhost:3000/org/${orgId}/vaults`, { name });
+        const res = await axios.post(`http://localhost:3000/org/${orgId}/vaults`, {
+            name,
+            ownerUserId,
+            wrappedKey
+        });
         return res.data;
     } catch (err) {
         console.error("Failed to create vault", err);
@@ -94,9 +112,22 @@ export const createVault = async (orgId, name) => {
     }
 };
 // assign a user to a vault
-export const addUserToVault = async (userId, vaultId) => {
+export const addUserToVault = async (
+    userId,
+    vaultId,
+    wrappedKey,
+    permCanCreateItems = false,
+    permCanAddUserFromVault = false,
+    permCanRemoveUserFromVault = false
+) => {
     try {
-        const res = await axios.post(`http://localhost:3000/users/${userId}/vaults`, { vaultId });
+        const res = await axios.post(`http://localhost:3000/users/${userId}/vaults`, {
+            vaultId,
+            wrappedKey,
+            permCanCreateItems,
+            permCanAddUserFromVault,
+            permCanRemoveUserFromVault
+        });
         return res.data;
     } catch (err) {
         console.error("Failed to add user to vault", err);
