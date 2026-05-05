@@ -2,7 +2,7 @@ import { OpenAPIRoute } from "chanfana";
 import { z } from "zod";
 import { prismaClient } from "../../db/client.js";
 import type { AppContext } from "../../index.js";
-import type { Prisma } from "../../generated/client.js";
+import type { Prisma } from "../../generated/prisma/client.js";
 
 export class PostCreateVault extends OpenAPIRoute {
   schema = {
