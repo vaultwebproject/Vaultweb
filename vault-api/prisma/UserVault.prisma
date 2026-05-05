@@ -15,8 +15,7 @@ model UserVault {
   vault   Vault  @relation(fields: [vaultId], references: [id], onDelete: Cascade)
 
     // Permissions
-    vaultRole  VaultRole @default(VIEWER)
-  // Permissions
+  vaultRole  VaultRole @default(VIEWER)
   permCanCreateItems         Boolean @default(false)
   permCanRemoveUserFromVault Boolean @default(false)
   permCanAddUserFromVault    Boolean @default(false)
