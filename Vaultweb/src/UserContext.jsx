@@ -8,9 +8,25 @@ const UserProvider = props => {
     const [uuID, setuuID] = useState("");
     const [privateKey, setPrivateKey] = useState("");
     const [orgId, setOrgId] = useState("");
+    const [role, setRole] = useState("");
 
     return (
-        <UserContext.Provider value={{userName, setUserName, uuID, setuuID, userKey, setUserKey, privateKey, setPrivateKey, orgId, setOrgId}}>
+        <UserContext.Provider
+            value={{
+                userName,
+                setUserName,
+                uuID,
+                setuuID,
+                userKey,
+                setUserKey,
+                privateKey,
+                setPrivateKey,
+                orgId,
+                setOrgId,
+                role,
+                setRole
+            }}
+        >
             {props.children}
         </UserContext.Provider>
     );

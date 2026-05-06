@@ -1,6 +1,7 @@
 model Vault {
   id           String      @id @unique @default(uuid(7))
   name         String
+  active       Boolean     @default(true)
   items        Item[]
   userVaults   UserVault[]
   departmentId String?

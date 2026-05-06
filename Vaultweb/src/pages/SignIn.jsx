@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Lock, Mail, ArrowRight, ShieldCheck, Github } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createMasterKey } from '../utilites/cryptoUtilities';
 import { submitLogin, retrieveUserInfo } from '../utilites/netUtilities';
-import { useContext } from 'react';
 import { UserContext } from "../UserContext";
-import { useNavigate } from 'react-router-dom';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -21,15 +19,25 @@ const SignIn = () => {
 
     if (result?.confirm === true) {
       const userData = await retrieveUserInfo(result.id);
+
       if (userData?.success) {
         const user = userData.result.user;
+
         userInfo.setUserName(user.email);
         userInfo.setuuID(user.id);
         userInfo.setOrgId(user.orgId);
+        userInfo.setRole(user.role);
+
         const key = await createMasterKey(email, password);
         userInfo.setUserKey(key);
+
         localStorage.setItem('vault_user_id', user.id);
-        navigate('/admin');
+
+        if (user.role === "ORG_ADMIN") {
+          navigate('/admin');
+        } else {
+          navigate('/vault');
+        }
       }
     }
   };
@@ -39,7 +47,6 @@ const SignIn = () => {
 
       <div className="relative w-full max-w-md animate-in fade-in zoom-in-95 duration-700">
         
-        {/* Logo/Brand Area */}
         <div className="text-center mb-10">
           <div className="inline-flex p-4 rounded-[2rem] bg-white border border-sky-100 shadow-xl shadow-sky-200/50 mb-6 group hover:scale-110 transition-transform duration-500">
             <ShieldCheck className="text-sky-600 w-10 h-10" />
@@ -48,7 +55,6 @@ const SignIn = () => {
           <p className="text-slate-500 text-sm mt-2 font-medium">Enter your credentials to decrypt your environment.</p>
         </div>
 
-        {/* Login Card */}
         <div className="bg-white/80 border border-sky-100 backdrop-blur-2xl rounded-[2.5rem] p-10 shadow-2xl shadow-sky-200/40">
           <form onSubmit={handleSignIn} className="space-y-6">
             
@@ -69,7 +75,7 @@ const SignIn = () => {
 
             <div>
               <div className="flex justify-between mb-2 ml-1">
-                <label className="block text-[10px] font-black text-sky-900/40 uppercase mb-2 ml-1 tracking-[0.2em]">Work Email</label>
+                <label className="block text-[10px] font-black text-sky-900/40 uppercase tracking-[0.2em]">Password</label>
                 <a href="#" className="text-[10px] text-sky-600 hover:text-sky-700 font-black uppercase tracking-widest transition-colors">Forgot Password?</a>
               </div>
               <div className="relative group">
@@ -85,7 +91,6 @@ const SignIn = () => {
               </div>
             </div>
 
-            {/* Submit Button */}
             <button 
               type="submit" 
               className="w-full bg-sky-600 text-white py-4.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-sky-700 transition-all shadow-xl shadow-sky-200 flex items-center justify-center gap-2 group active:scale-95 mt-4"
@@ -94,14 +99,12 @@ const SignIn = () => {
             </button>
           </form>
 
-          {/* Divider */}
           <div className="flex items-center my-10">
             <div className="flex-1 h-px bg-sky-100" />
             <span className="px-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] whitespace-nowrap">Secure Gateway</span>
             <div className="flex-1 h-px bg-sky-100" />
           </div>
 
-          {/* OAuth Options */}
           <div className="grid grid-cols-1 gap-4">
              <button className="flex items-center justify-center gap-3 w-full bg-white border border-sky-100 py-4 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-600 hover:bg-sky-50 hover:border-sky-200 transition-all shadow-sm">
                 <Github size={18} className="text-slate-900" /> Continue with GitHub
@@ -109,21 +112,19 @@ const SignIn = () => {
           </div>
         </div>
 
-        {/* --- FOOTER LINK --- */}
         <p className="text-center mt-10 text-slate-500 text-sm font-medium">
-          Don't have an organization? {' '}
+          Don't have an organization?{' '}
           <Link to="/create-org" className="text-sky-600 font-black hover:text-sky-700 transition-colors underline decoration-sky-100 underline-offset-4">
             Create One Now
           </Link>
         </p>
         <p className="text-center mt-8 text-slate-500 text-sm">
-          Don't have an account? {' '}
+          Don't have an account?{' '}
           <Link to="/signup" className="text-sky-600 font-black hover:text-sky-700 transition-colors underline decoration-sky-100 underline-offset-4">
             Create One Now
           </Link>
         </p>
 
-        {/* Bottom Badge */}
         <div className="mt-12 flex justify-center items-center gap-2 text-[10px] font-black text-sky-900/20 uppercase tracking-[0.2em]">
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
           SSL & Client-Side AES Active

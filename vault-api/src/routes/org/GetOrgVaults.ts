@@ -26,6 +26,7 @@ export class GetOrgVaults extends OpenAPIRoute {
       select: {
         id: true,
         name: true,
+        active: true,
         currentDate: true,
         createdAt: true,
         updatedAt: true,
@@ -46,6 +47,7 @@ export class GetOrgVaults extends OpenAPIRoute {
     const formattedVaults = vaults.map((vault: any) => ({
       id: vault.id,
       name: vault.name,
+      active: vault.active,
       currentDate: vault.currentDate,
       createdAt: vault.createdAt,
       updatedAt: vault.updatedAt,

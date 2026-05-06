@@ -1038,6 +1038,7 @@ export type UserVaultScalarFieldEnum = (typeof UserVaultScalarFieldEnum)[keyof t
 export const VaultScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  active: 'active',
   departmentId: 'departmentId',
   currentDate: 'currentDate',
   createdAt: 'createdAt',

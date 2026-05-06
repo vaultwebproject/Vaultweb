@@ -27,6 +27,7 @@ export type AggregateVault = {
 export type VaultMinAggregateOutputType = {
   id: string | null
   name: string | null
+  active: boolean | null
   departmentId: string | null
   currentDate: Date | null
   createdAt: Date | null
@@ -36,6 +37,7 @@ export type VaultMinAggregateOutputType = {
 export type VaultMaxAggregateOutputType = {
   id: string | null
   name: string | null
+  active: boolean | null
   departmentId: string | null
   currentDate: Date | null
   createdAt: Date | null
@@ -45,6 +47,7 @@ export type VaultMaxAggregateOutputType = {
 export type VaultCountAggregateOutputType = {
   id: number
   name: number
+  active: number
   departmentId: number
   currentDate: number
   createdAt: number
@@ -56,6 +59,7 @@ export type VaultCountAggregateOutputType = {
 export type VaultMinAggregateInputType = {
   id?: true
   name?: true
+  active?: true
   departmentId?: true
   currentDate?: true
   createdAt?: true
@@ -65,6 +69,7 @@ export type VaultMinAggregateInputType = {
 export type VaultMaxAggregateInputType = {
   id?: true
   name?: true
+  active?: true
   departmentId?: true
   currentDate?: true
   createdAt?: true
@@ -74,6 +79,7 @@ export type VaultMaxAggregateInputType = {
 export type VaultCountAggregateInputType = {
   id?: true
   name?: true
+  active?: true
   departmentId?: true
   currentDate?: true
   createdAt?: true
@@ -156,6 +162,7 @@ export type VaultGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type VaultGroupByOutputType = {
   id: string
   name: string
+  active: boolean
   departmentId: string | null
   currentDate: Date
   createdAt: Date
@@ -186,6 +193,7 @@ export type VaultWhereInput = {
   NOT?: Prisma.VaultWhereInput | Prisma.VaultWhereInput[]
   id?: Prisma.StringFilter<"Vault"> | string
   name?: Prisma.StringFilter<"Vault"> | string
+  active?: Prisma.BoolFilter<"Vault"> | boolean
   departmentId?: Prisma.StringNullableFilter<"Vault"> | string | null
   currentDate?: Prisma.DateTimeFilter<"Vault"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Vault"> | Date | string
@@ -198,6 +206,7 @@ export type VaultWhereInput = {
 export type VaultOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  active?: Prisma.SortOrder
   departmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   currentDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -213,6 +222,7 @@ export type VaultWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.VaultWhereInput[]
   NOT?: Prisma.VaultWhereInput | Prisma.VaultWhereInput[]
   name?: Prisma.StringFilter<"Vault"> | string
+  active?: Prisma.BoolFilter<"Vault"> | boolean
   departmentId?: Prisma.StringNullableFilter<"Vault"> | string | null
   currentDate?: Prisma.DateTimeFilter<"Vault"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Vault"> | Date | string
@@ -225,6 +235,7 @@ export type VaultWhereUniqueInput = Prisma.AtLeast<{
 export type VaultOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  active?: Prisma.SortOrder
   departmentId?: Prisma.SortOrderInput | Prisma.SortOrder
   currentDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -240,6 +251,7 @@ export type VaultScalarWhereWithAggregatesInput = {
   NOT?: Prisma.VaultScalarWhereWithAggregatesInput | Prisma.VaultScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Vault"> | string
   name?: Prisma.StringWithAggregatesFilter<"Vault"> | string
+  active?: Prisma.BoolWithAggregatesFilter<"Vault"> | boolean
   departmentId?: Prisma.StringNullableWithAggregatesFilter<"Vault"> | string | null
   currentDate?: Prisma.DateTimeWithAggregatesFilter<"Vault"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Vault"> | Date | string
@@ -249,6 +261,7 @@ export type VaultScalarWhereWithAggregatesInput = {
 export type VaultCreateInput = {
   id?: string
   name: string
+  active?: boolean
   currentDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -260,6 +273,7 @@ export type VaultCreateInput = {
 export type VaultUncheckedCreateInput = {
   id?: string
   name: string
+  active?: boolean
   departmentId?: string | null
   currentDate?: Date | string
   createdAt?: Date | string
@@ -271,6 +285,7 @@ export type VaultUncheckedCreateInput = {
 export type VaultUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -282,6 +297,7 @@ export type VaultUpdateInput = {
 export type VaultUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -293,6 +309,7 @@ export type VaultUncheckedUpdateInput = {
 export type VaultCreateManyInput = {
   id?: string
   name: string
+  active?: boolean
   departmentId?: string | null
   currentDate?: Date | string
   createdAt?: Date | string
@@ -302,6 +319,7 @@ export type VaultCreateManyInput = {
 export type VaultUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -310,6 +328,7 @@ export type VaultUpdateManyMutationInput = {
 export type VaultUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -334,6 +353,7 @@ export type VaultScalarRelationFilter = {
 export type VaultCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  active?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
   currentDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -343,6 +363,7 @@ export type VaultCountOrderByAggregateInput = {
 export type VaultMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  active?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
   currentDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -352,6 +373,7 @@ export type VaultMaxOrderByAggregateInput = {
 export type VaultMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  active?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
   currentDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -435,6 +457,7 @@ export type NullableStringFieldUpdateOperationsInput = {
 export type VaultCreateWithoutDepartmentInput = {
   id?: string
   name: string
+  active?: boolean
   currentDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -445,6 +468,7 @@ export type VaultCreateWithoutDepartmentInput = {
 export type VaultUncheckedCreateWithoutDepartmentInput = {
   id?: string
   name: string
+  active?: boolean
   currentDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -483,6 +507,7 @@ export type VaultScalarWhereInput = {
   NOT?: Prisma.VaultScalarWhereInput | Prisma.VaultScalarWhereInput[]
   id?: Prisma.StringFilter<"Vault"> | string
   name?: Prisma.StringFilter<"Vault"> | string
+  active?: Prisma.BoolFilter<"Vault"> | boolean
   departmentId?: Prisma.StringNullableFilter<"Vault"> | string | null
   currentDate?: Prisma.DateTimeFilter<"Vault"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Vault"> | Date | string
@@ -492,6 +517,7 @@ export type VaultScalarWhereInput = {
 export type VaultCreateWithoutItemsInput = {
   id?: string
   name: string
+  active?: boolean
   currentDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -502,6 +528,7 @@ export type VaultCreateWithoutItemsInput = {
 export type VaultUncheckedCreateWithoutItemsInput = {
   id?: string
   name: string
+  active?: boolean
   departmentId?: string | null
   currentDate?: Date | string
   createdAt?: Date | string
@@ -528,6 +555,7 @@ export type VaultUpdateToOneWithWhereWithoutItemsInput = {
 export type VaultUpdateWithoutItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -538,6 +566,7 @@ export type VaultUpdateWithoutItemsInput = {
 export type VaultUncheckedUpdateWithoutItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -548,6 +577,7 @@ export type VaultUncheckedUpdateWithoutItemsInput = {
 export type VaultCreateWithoutUserVaultsInput = {
   id?: string
   name: string
+  active?: boolean
   currentDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -558,6 +588,7 @@ export type VaultCreateWithoutUserVaultsInput = {
 export type VaultUncheckedCreateWithoutUserVaultsInput = {
   id?: string
   name: string
+  active?: boolean
   departmentId?: string | null
   currentDate?: Date | string
   createdAt?: Date | string
@@ -584,6 +615,7 @@ export type VaultUpdateToOneWithWhereWithoutUserVaultsInput = {
 export type VaultUpdateWithoutUserVaultsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -594,6 +626,7 @@ export type VaultUpdateWithoutUserVaultsInput = {
 export type VaultUncheckedUpdateWithoutUserVaultsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   departmentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -604,6 +637,7 @@ export type VaultUncheckedUpdateWithoutUserVaultsInput = {
 export type VaultCreateManyDepartmentInput = {
   id?: string
   name: string
+  active?: boolean
   currentDate?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -612,6 +646,7 @@ export type VaultCreateManyDepartmentInput = {
 export type VaultUpdateWithoutDepartmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -622,6 +657,7 @@ export type VaultUpdateWithoutDepartmentInput = {
 export type VaultUncheckedUpdateWithoutDepartmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -632,6 +668,7 @@ export type VaultUncheckedUpdateWithoutDepartmentInput = {
 export type VaultUncheckedUpdateManyWithoutDepartmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   currentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -680,6 +717,7 @@ export type VaultCountOutputTypeCountUserVaultsArgs<ExtArgs extends runtime.Type
 export type VaultSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  active?: boolean
   departmentId?: boolean
   currentDate?: boolean
   createdAt?: boolean
@@ -693,6 +731,7 @@ export type VaultSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type VaultSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  active?: boolean
   departmentId?: boolean
   currentDate?: boolean
   createdAt?: boolean
@@ -703,6 +742,7 @@ export type VaultSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type VaultSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  active?: boolean
   departmentId?: boolean
   currentDate?: boolean
   createdAt?: boolean
@@ -713,13 +753,14 @@ export type VaultSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type VaultSelectScalar = {
   id?: boolean
   name?: boolean
+  active?: boolean
   departmentId?: boolean
   currentDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type VaultOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "departmentId" | "currentDate" | "createdAt" | "updatedAt", ExtArgs["result"]["vault"]>
+export type VaultOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "active" | "departmentId" | "currentDate" | "createdAt" | "updatedAt", ExtArgs["result"]["vault"]>
 export type VaultInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   items?: boolean | Prisma.Vault$itemsArgs<ExtArgs>
   userVaults?: boolean | Prisma.Vault$userVaultsArgs<ExtArgs>
@@ -743,6 +784,7 @@ export type $VaultPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
+    active: boolean
     departmentId: string | null
     currentDate: Date
     createdAt: Date
@@ -1175,6 +1217,7 @@ export interface Prisma__VaultClient<T, Null = never, ExtArgs extends runtime.Ty
 export interface VaultFieldRefs {
   readonly id: Prisma.FieldRef<"Vault", 'String'>
   readonly name: Prisma.FieldRef<"Vault", 'String'>
+  readonly active: Prisma.FieldRef<"Vault", 'Boolean'>
   readonly departmentId: Prisma.FieldRef<"Vault", 'String'>
   readonly currentDate: Prisma.FieldRef<"Vault", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Vault", 'DateTime'>

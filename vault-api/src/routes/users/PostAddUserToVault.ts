@@ -49,6 +49,10 @@ export class PostAddUserToVault extends OpenAPIRoute {
       return c.json({ success: false, error: "Vault not found" }, 404);
     }
 
+    if (!vault.active) {
+      return c.json({ success: false, error: "Vault is inactive and must be reactivated before assigning users" }, 409);
+    }
+
     const existing = await prisma.userVault.findFirst({
       where: {
         userId,

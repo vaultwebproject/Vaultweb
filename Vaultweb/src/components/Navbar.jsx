@@ -1,20 +1,19 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ShieldCheck, Menu, X, Upload as UploadIcon } from "lucide-react";
+import { ShieldCheck, Upload as UploadIcon } from "lucide-react";
+import { UserContext } from "../UserContext";
 
 const Navbar = () => {
   const location = useLocation();
+  const { role } = useContext(UserContext);
 
-  // Helper to highlight active links
   const isActive = (path) => location.pathname === path;
 
   return (
     <nav className="fixed top-0 left-0 w-full h-20 z-[100] bg-white/70 backdrop-blur-xl border-b border-sky-100/50 font-[Poppins] transition-all">
       <div className="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
-        {/* 1. LOGO SECTION */}
         <Link to="/" className="flex items-center space-x-3 group z-[110]">
           <div className="relative">
-            {/* Soft Cyan Glow behind logo */}
             <div className="absolute -inset-1.5 bg-sky-400/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition duration-500" />
             <div className="relative bg-white border border-sky-100 rounded-xl p-2 shadow-sm shadow-sky-200/50 group-hover:scale-110 transition-transform duration-300">
               <ShieldCheck className="w-6 h-6 text-sky-600" />
@@ -25,27 +24,38 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* 2. DESKTOP MENU (Absolute Center) */}
         <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center space-x-8 text-[11px] font-black tracking-[0.2em] text-slate-400">
-          {[
-            { name: "HOME", path: "/" },
-            { name: "VAULTS", path: "/vault" },
-            { name: "ORGANISATION", path: "/create-org" },
-            { name: "ADMIN", path: "/admin" },
-          ].map((link) => (
+          <Link
+            to="/"
+            className={`hover:text-sky-600 transition-colors ${isActive("/") ? "text-sky-600" : ""}`}
+          >
+            HOME
+          </Link>
+
+          <Link
+            to="/vault"
+            className={`hover:text-sky-600 transition-colors ${isActive("/vault") ? "text-sky-600" : ""}`}
+          >
+            VAULTS
+          </Link>
+
+          <Link
+            to="/create-org"
+            className={`hover:text-sky-600 transition-colors ${isActive("/create-org") ? "text-sky-600" : ""}`}
+          >
+            ORGANISATION
+          </Link>
+
+          {role === "ORG_ADMIN" && (
             <Link
-              key={link.name}
-              to={link.path}
-              className={`hover:text-sky-600 transition-colors ${
-                isActive(link.path) ? "text-sky-600" : ""
-              }`}
+              to="/admin"
+              className={`hover:text-sky-600 transition-colors ${isActive("/admin") ? "text-sky-600" : ""}`}
             >
-              {link.name}
+              ADMIN
             </Link>
-          ))}
+          )}
         </div>
 
-        {/* 3. RIGHT SIDE: Actions */}
         <div className="flex items-center space-x-6 z-[110]">
           <Link
             to="/signin"
@@ -60,7 +70,6 @@ const Navbar = () => {
               Upload
             </button>
           </Link>
-
         </div>
       </div>
     </nav>

@@ -105,7 +105,6 @@ export const createVault = async (orgId, name, ownerUserId, wrappedKey, departme
             ownerUserId,
             wrappedKey,
             departmentId
-
         });
         return res.data;
     } catch (err) {
@@ -113,6 +112,7 @@ export const createVault = async (orgId, name, ownerUserId, wrappedKey, departme
         return null;
     }
 };
+
 // assign a user to a vault
 export const addUserToVault = async (
     userId,
@@ -153,6 +153,26 @@ export const deactivateVault = async (vaultId) => {
         return res.data;
     } catch (err) {
         console.error("Failed to deactivate vault", err);
+        return null;
+    }
+};
+
+export const retrieveOrgDepartments = async (orgId) => {
+    try {
+        const res = await axios.get(`http://localhost:3000/org/${orgId}/departments`);
+        return res.data;
+    } catch (err) {
+        console.error("Failed to retrieve organisation departments", err);
+        return null;
+    }
+};
+
+export const reactivateVault = async (vaultId) => {
+    try {
+        const res = await axios.patch(`http://localhost:3000/vaults/${vaultId}/reactivate`);
+        return res.data;
+    } catch (err) {
+        console.error("Failed to reactivate vault", err);
         return null;
     }
 };

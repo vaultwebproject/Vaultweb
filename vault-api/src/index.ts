@@ -19,6 +19,9 @@ import { PostAddUserToVault } from "./routes/users/PostAddUserToVault.js";
 import { DeleteUserVaultAccess } from "./routes/users/DeleteUserVaultAccess.js";
 import { PatchDeactivateVault } from "./routes/vault/PatchDeactivateVault.js";
 
+import { GetOrgDepartments } from "./routes/org/GetOrgDepartments.js";
+import { PatchReactivateVault } from "./routes/vault/PatchReactivateVault.js";
+
 const app = new Hono();
 
 app.use(cors({ origin: "http://localhost:5173" })); // Enable CORS for requests from the frontend running on localhost:5173
@@ -49,6 +52,9 @@ openapi.post("/users/:userId/vaults", PostAddUserToVault);
 openapi.delete("/users/:userId/vaults/:vaultId", DeleteUserVaultAccess);
 
 openapi.patch("/vaults/:vaultId/deactivate", PatchDeactivateVault);
+
+openapi.get("/org/:orgId/departments", GetOrgDepartments);
+openapi.patch("/vaults/:vaultId/reactivate", PatchReactivateVault);
 
 serve(
   {

@@ -3,9 +3,9 @@ import { z } from "zod";
 import { prismaClient } from "../../db/client.js";
 import type { AppContext } from "../../index.js";
 
-export class PatchDeactivateVault extends OpenAPIRoute {
+export class PatchReactivateVault extends OpenAPIRoute {
   schema = {
-    operationId: "PatchDeactivateVault",
+    operationId: "PatchReactivateVault",
     request: {
       params: z.object({
         vaultId: z.uuidv7(),
@@ -27,34 +27,19 @@ export class PatchDeactivateVault extends OpenAPIRoute {
       return c.json({ success: false, error: "Vault not found" }, 404);
     }
 
-    const result = await prisma.$transaction(async (tx) => {
-      const updatedVault = await tx.vault.update({
-        where: {
-          id: data.params.vaultId,
-        },
-        data: {
-          active: false,
-        },
-      });
-
-      const deleted = await tx.userVault.deleteMany({
-        where: {
-          vaultId: data.params.vaultId,
-        },
-      });
-
-      return {
-        vault: updatedVault,
-        removedAccessCount: deleted.count,
-      };
+    const updatedVault = await prisma.vault.update({
+      where: {
+        id: data.params.vaultId,
+      },
+      data: {
+        active: true,
+      },
     });
 
     return c.json({
       success: true,
       result: {
-        vaultId: data.params.vaultId,
-        active: result.vault.active,
-        removedAccessCount: result.removedAccessCount,
+        vault: updatedVault,
       },
     });
   }

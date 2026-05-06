@@ -33,22 +33,23 @@ export class PostCreateVault extends OpenAPIRoute {
     const { orgId } = data.params;
     const { name, ownerUserId, wrappedKey, departmentId } = data.body;
 
-    const owner = await prisma.user.findFirst({
+    const department = await prisma.department.findFirst({
       where: {
-        id: ownerUserId,
+        id: departmentId,
         orgId,
       },
     });
 
-    if (!owner) {
-      return c.json({ success: false, error: "Owner user not found in organisation" }, 404);
-    }
+    if (!department) {
+      return c.json({ success: false, error: "Department not found in organisation" }, 404);
+}
 
     const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const vault = await tx.vault.create({
         data: {
           name,
           departmentId,
+          active: true,
         },
       });
 
