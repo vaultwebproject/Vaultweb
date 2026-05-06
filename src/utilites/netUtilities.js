@@ -28,8 +28,9 @@ export const submitLogin = async (email, password) => {
     }
 };
 
-export const submitSecret = async (key, data, userID, name) => {
-    const { cipherText: submissionData, iv } = await encryptData(data, key);
+export const submitSecret = async (key, data, userID, name, iv) => {
+    var submissionData = "";
+    submissionData, iv = encryptData(data, key);
 
     const submission = new FormData();
     submission.append("userID", userID);
@@ -169,4 +170,3 @@ export const deleteAuditLogs = async () => {
         console.error("Audit log delete failed:", err.message);
     }
 };
-
