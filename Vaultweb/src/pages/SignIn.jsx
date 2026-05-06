@@ -1,22 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Lock, Mail, ArrowRight, ShieldCheck, Github } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { createMasterKey } from '../utilites/cryptoUtilities';
-import { submitLogin, retriveUserInfo } from '../utilites/netUtilities';
-import { useContext } from 'react';
-import UserProvider from "../UserContext";
+import { Link, useNavigate } from 'react-router-dom';
+import { submitLogin } from '../utilites/netUtilities';
+import { UserContext } from "../UserContext";
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState("");
-  const userInfo = useContext(UserProvider);
+  const [error, setError] = useState("");
+  const { setuuID, setUserName } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
-    console.log("Initiating secure session for:", email);
+    setError("");
     const result = await submitLogin(email, password);
     if (result?.confirm === true) {
-      const userData = await retriveUserInfo(result.id);
+      setuuID(result.id);
+      setUserName(email);
+      navigate("/vault");
+    } else {
+      setError("Invalid email or password.");
     }
   };
 
@@ -75,8 +79,12 @@ const SignIn = () => {
               </div>
             </div>
 
-            <button 
-              type="submit" 
+            {error && (
+              <p className="text-red-400 text-xs font-semibold text-center">{error}</p>
+            )}
+
+            <button
+              type="submit"
               className="w-full bg-white text-black py-4 rounded-xl font-bold hover:bg-slate-200 transition-all flex items-center justify-center gap-2 group"
             >
               Sign In <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />

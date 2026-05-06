@@ -2,12 +2,12 @@ import React, { useContext, useEffect, useState } from "react";
 import { Lock, Eye, EyeOff, Search, Plus, Trash2, Copy } from "lucide-react";
 import { decryptData } from "../utilites/cryptoUtilities";
 import { retriveSecretByVault, retriveUserSecrets } from "../utilites/netUtilities";
-import UserProvider from "../UserContext";
+import { UserContext } from "../UserContext";
 
 const MyVault = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [decryptedId, setDecryptedId] = useState(null);
-  const userInfo = useContext(UserProvider);
+  const userInfo = useContext(UserContext);
   const [vaultItems, setVaultItems] = useState([]);
 
   useEffect(() => {
