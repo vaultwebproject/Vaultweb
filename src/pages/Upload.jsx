@@ -1,10 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { ShieldCheck, Lock, ArrowUpCircle, Info, CheckCircle } from 'lucide-react';
 import { submitSecret } from '../utilites/netUtilities';
+import { logEvent, LOG_ACTIONS, SEVERITY, TARGET_TYPES, ACTION_STATUS } from '../utilites/auditLogger';
+import { UserContext } from '../UserContext';
 
 const Upload = () => {
   const [formData, setFormData] = useState({ name: '', category: 'General', value: '' });
   const [status, setStatus] = useState('idle'); // idle | encrypting | uploading | success
+  const ctx            = useContext(UserContext) ?? {};
+  const userId         = ctx.uuID            || 0;
+  const userName       = ctx.userName        || 'Unknown';
+  const userKey        = ctx.userKey         || null;
+  const organisationId = ctx.organisationId  || 0;
+  const userRole       = ctx.userRole        || 'Member';
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setStatus('encrypting');
+      const iv = crypto.randomUUID();
+      setStatus('uploading');
+      await submitSecret(userKey, formData.value, userId, formData.name, iv);
+      await logEvent({
+        action:         LOG_ACTIONS.SECRET_CREATED,
+        userId,
+        userName,
+        organisationId,
+        userRole,
+        targetType:     TARGET_TYPES.SECRET,
+        target:         formData.name,
+        actionStatus:   ACTION_STATUS.SUCCESS,
+        details:        `Category: ${formData.category}`,
+        severity:       SEVERITY.INFO,
+      });
+      setStatus('success');
+    } catch (err) {
+      await logEvent({
+        action:         LOG_ACTIONS.SECRET_CREATED,
+        userId,
+        userName,
+        organisationId,
+        userRole,
+        targetType:     TARGET_TYPES.SECRET,
+        target:         formData.name,
+        actionStatus:   ACTION_STATUS.FAILED,
+        failureReason:  err.message,
+        details:        `Category: ${formData.category}`,
+        severity:       SEVERITY.WARN,
+      });
+      setStatus('idle');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-[Poppins] pt-24 pb-12 px-6">
@@ -20,7 +66,7 @@ const Upload = () => {
         </div>
 
         {/* Upload Form */}
-        <form onSubmit={submitSecret} className="bg-slate-900/40 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-2xl space-y-6">
+        <form onSubmit={handleSubmit} className="bg-slate-900/40 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-2xl space-y-6">
           
           {/* Status Overlay */}
           {status !== 'idle' && (

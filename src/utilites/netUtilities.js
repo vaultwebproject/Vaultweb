@@ -73,6 +73,18 @@ export const retriveSecretByVault = async (vaultID) => {
     }
 };
 
+export const submitOrganisation = async (name, adminEmail) => {
+    try {
+        const result = await axios.post(`${API_BASE}/organisations/create`, {
+            name,
+            admin_email: adminEmail,
+        });
+        return result.data;
+    } catch (err) {
+        console.error("Organisation creation failed:", err.message);
+    }
+};
+
 // --- Audit log endpoints ---
 
 /**
@@ -170,3 +182,4 @@ export const deleteAuditLogs = async () => {
         console.error("Audit log delete failed:", err.message);
     }
 };
+

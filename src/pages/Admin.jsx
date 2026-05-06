@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import {
   Users, Activity, ShieldCheck, UserPlus, MoreVertical,
   FileText, Download, RefreshCw, AlertTriangle, CheckCircle2,
   XCircle, Filter, Search,
 } from 'lucide-react';
 import {
-  getLogs, verifyChain, exportLogsCSV, clearLogs, LOG_ACTIONS, SEVERITY,
+  getLogs, verifyChain, exportLogsCSV, clearLogs, logEvent, LOG_ACTIONS, SEVERITY, TARGET_TYPES,
 } from '../utilites/auditLogger';
+import { submitAccount } from '../utilites/netUtilities';
+import { UserContext } from '../UserContext';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -42,8 +44,9 @@ const formatTime = (iso) => {
   return new Date(iso).toLocaleDateString();
 };
 
-// ── mock users (replace with API data when backend is ready) ──────────────────
-const MOCK_USERS = [
+const ROLES = ['Organiser', 'Member', 'Auditor'];
+
+const INITIAL_USERS = [
   { id: 1, name: 'Sarah Connor',  email: 'sarah@vault.com', role: 'Organiser', status: 'Active'  },
   { id: 2, name: 'John Doe',      email: 'john@vault.com',  role: 'Member',    status: 'Active'  },
   { id: 3, name: 'Kyle Reese',    email: 'kyle@vault.com',  role: 'Auditor',   status: 'Pending' },
@@ -54,11 +57,56 @@ const MOCK_USERS = [
 const Admin = () => {
   const [activeTab,    setActiveTab]    = useState('users');
   const [logs,         setLogs]         = useState([]);
-  const [chainStatus,  setChainStatus]  = useState(null); // null | { valid, tamperedIds }
+  const [chainStatus,  setChainStatus]  = useState(null);
   const [verifying,    setVerifying]    = useState(false);
   const [filterSev,    setFilterSev]    = useState('ALL');
   const [filterAction, setFilterAction] = useState('ALL');
   const [search,       setSearch]       = useState('');
+  const [users,        setUsers]        = useState(INITIAL_USERS);
+  const [inviteEmail,  setInviteEmail]  = useState('');
+  const [inviteRole,   setInviteRole]   = useState('Member');
+  const [showInvite,   setShowInvite]   = useState(false);
+
+  const ctx            = useContext(UserContext) ?? {};
+  const actorId        = ctx.uuID            || 0;
+  const actorName      = ctx.userName        || 'Admin';
+  const organisationId = ctx.organisationId  || 0;
+  const actorRole      = ctx.userRole        || 'Organiser';
+
+  const handleInvite = async () => {
+    if (!inviteEmail) return;
+    await submitAccount(inviteEmail, inviteRole, organisationId);
+    await logEvent({
+      action:         LOG_ACTIONS.USER_INVITED,
+      userId:         actorId,
+      userName:       actorName,
+      organisationId,
+      userRole:       actorRole,
+      targetType:     TARGET_TYPES.USER,
+      target:         inviteEmail,
+      details:        `Invited as ${inviteRole}`,
+      severity:       SEVERITY.INFO,
+    });
+    setUsers(prev => [...prev, { id: Date.now(), name: inviteEmail, email: inviteEmail, role: inviteRole, status: 'Pending' }]);
+    setInviteEmail('');
+    setShowInvite(false);
+  };
+
+  const handleRoleChange = async (user, newRole) => {
+    await logEvent({
+      action:         LOG_ACTIONS.ROLE_CHANGED,
+      userId:         actorId,
+      userName:       actorName,
+      organisationId,
+      userRole:       actorRole,
+      targetType:     TARGET_TYPES.USER,
+      targetId:       user.id,
+      target:         user.name,
+      details:        `Role changed from ${user.role} to ${newRole}`,
+      severity:       SEVERITY.WARN,
+    });
+    setUsers(prev => prev.map(u => u.id === user.id ? { ...u, role: newRole } : u));
+  };
 
   const loadLogs = useCallback(async () => {
     setLogs(await getLogs());
@@ -111,7 +159,10 @@ const Admin = () => {
             </h1>
             <p className="text-slate-400 mt-1">Manage infrastructure access and monitor security compliance.</p>
           </div>
-          <button className="flex items-center gap-2 bg-white text-black px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-200 transition-all">
+          <button
+            onClick={() => setShowInvite(v => !v)}
+            className="flex items-center gap-2 bg-white text-black px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-200 transition-all"
+          >
             <UserPlus size={18} /> Add Member
           </button>
         </div>
@@ -135,43 +186,82 @@ const Admin = () => {
 
         {/* ── USERS TAB ── */}
         {activeTab === 'users' && (
-          <div className="bg-slate-900/40 border border-white/5 rounded-3xl backdrop-blur-xl overflow-hidden shadow-2xl animate-in fade-in duration-500">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-white/[0.02] border-b border-white/5">
-                  <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Member</th>
-                  <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Access Level</th>
-                  <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
-                  <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Settings</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {MOCK_USERS.map(user => (
-                  <tr key={user.id} className="hover:bg-white/[0.01] transition-colors">
-                    <td className="px-8 py-6">
-                      <div className="font-bold text-white">{user.name}</div>
-                      <div className="text-xs text-slate-500 font-mono">{user.email}</div>
-                    </td>
-                    <td className="px-8 py-6">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${user.role === 'Organiser' ? 'bg-purple-500/20 text-purple-400' : 'bg-slate-800 text-slate-400'}`}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="px-8 py-6 text-sm font-medium">
-                      <div className="flex items-center gap-2">
-                        <div className={`w-1.5 h-1.5 rounded-full ${user.status === 'Active' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                        {user.status}
-                      </div>
-                    </td>
-                    <td className="px-8 py-6 text-right">
-                      <button className="p-2 hover:bg-white/5 rounded-lg text-slate-500 hover:text-white transition-all">
-                        <MoreVertical size={18} />
-                      </button>
-                    </td>
+          <div className="space-y-4 animate-in fade-in duration-500">
+
+            {/* Invite form */}
+            {showInvite && (
+              <div className="bg-slate-900/60 border border-white/10 rounded-2xl p-5 flex flex-wrap gap-3 items-end">
+                <div className="flex-1 min-w-48">
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Email</label>
+                  <input
+                    type="email"
+                    placeholder="member@company.com"
+                    value={inviteEmail}
+                    onChange={e => setInviteEmail(e.target.value)}
+                    className="w-full bg-slate-950 border border-white/5 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-purple-500/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Role</label>
+                  <select
+                    value={inviteRole}
+                    onChange={e => setInviteRole(e.target.value)}
+                    className="bg-slate-950 border border-white/5 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:ring-2 focus:ring-purple-500/50"
+                  >
+                    {ROLES.map(r => <option key={r}>{r}</option>)}
+                  </select>
+                </div>
+                <button
+                  onClick={handleInvite}
+                  className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold rounded-xl transition-all"
+                >
+                  Send Invite
+                </button>
+              </div>
+            )}
+
+            <div className="bg-slate-900/40 border border-white/5 rounded-3xl backdrop-blur-xl overflow-hidden shadow-2xl">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-white/[0.02] border-b border-white/5">
+                    <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Member</th>
+                    <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Access Level</th>
+                    <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                    <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Settings</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {users.map(user => (
+                    <tr key={user.id} className="hover:bg-white/[0.01] transition-colors">
+                      <td className="px-8 py-6">
+                        <div className="font-bold text-white">{user.name}</div>
+                        <div className="text-xs text-slate-500 font-mono">{user.email}</div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <select
+                          value={user.role}
+                          onChange={e => handleRoleChange(user, e.target.value)}
+                          className="bg-slate-800 text-slate-300 text-[10px] font-black uppercase tracking-tighter px-3 py-1 rounded-full outline-none cursor-pointer"
+                        >
+                          {ROLES.map(r => <option key={r}>{r}</option>)}
+                        </select>
+                      </td>
+                      <td className="px-8 py-6 text-sm font-medium">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-1.5 h-1.5 rounded-full ${user.status === 'Active' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                          {user.status}
+                        </div>
+                      </td>
+                      <td className="px-8 py-6 text-right">
+                        <button className="p-2 hover:bg-white/5 rounded-lg text-slate-500 hover:text-white transition-all">
+                          <MoreVertical size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 

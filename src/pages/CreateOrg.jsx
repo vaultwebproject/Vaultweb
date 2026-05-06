@@ -6,18 +6,39 @@ import {
   CheckCircle2,
   Download,
 } from "lucide-react";
+import { submitOrganisation } from "../utilites/netUtilities";
+import { logEvent, LOG_ACTIONS, SEVERITY, TARGET_TYPES } from "../utilites/auditLogger";
 
 const CreateOrganisation = () => {
   const [step, setStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [orgName, setOrgName] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
+  const [createdOrg, setCreatedOrg] = useState(null);
 
-  // This would trigger your window.crypto logic
+  const handleCreateOrg = async () => {
+    const result = await submitOrganisation(orgName, adminEmail);
+    setCreatedOrg(result);
+    await logEvent({
+      action:         LOG_ACTIONS.ORG_CREATED,
+      userId:         0,
+      userName:       adminEmail,
+      organisationId: result?.organisation_id ?? 0,
+      userRole:       'Organiser',
+      targetType:     TARGET_TYPES.ORG,
+      target:         orgName,
+      details:        `Organisation created by ${adminEmail}`,
+      severity:       SEVERITY.INFO,
+    });
+    setStep(2);
+  };
+
   const handleGenerateKeys = () => {
     setIsGenerating(true);
     setTimeout(() => {
       setIsGenerating(false);
       setStep(3);
-    }, 3000); // Mock generation time
+    }, 3000);
   };
 
   return (
@@ -57,6 +78,8 @@ const CreateOrganisation = () => {
                 <input
                   type="text"
                   placeholder="e.g. VaultCorp Industries"
+                  value={orgName}
+                  onChange={(e) => setOrgName(e.target.value)}
                   className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500/50 outline-none transition-all"
                 />
               </div>
@@ -67,12 +90,15 @@ const CreateOrganisation = () => {
                 <input
                   type="email"
                   placeholder="admin@vaultweb.com"
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
                   className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500/50 outline-none transition-all"
                 />
               </div>
               <button
-                onClick={() => setStep(2)}
-                className="w-full mt-6 bg-white text-black py-4 rounded-xl font-bold hover:scale-[1.02] transition-transform active:scale-95"
+                onClick={handleCreateOrg}
+                disabled={!orgName || !adminEmail}
+                className="w-full mt-6 bg-white text-black py-4 rounded-xl font-bold hover:scale-[1.02] transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Continue to Key Generation
               </button>

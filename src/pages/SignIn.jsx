@@ -1,49 +1,43 @@
 import React, { useState, useContext } from 'react';
 import { Lock, Mail, ArrowRight, ShieldCheck, Github } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createMasterKey } from '../utilites/cryptoUtilities';
 import { submitLogin, retriveUserInfo } from '../utilites/netUtilities';
 import { logEvent, LOG_ACTIONS, SEVERITY } from '../utilites/auditLogger';
+import { UserContext } from '../UserContext';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState("");
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { setUserName, setUserKey, setuuID } = useContext(UserContext) || {};
+  const { setUserName, setuuID, setUserKey, setOrganisationId, setUserRole } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
     try {
       const result = await submitLogin(email, password);
       if (result?.confirm === true) {
-        // Create master key from password for decryption
-        const salt = new TextEncoder().encode(result.id);
-        const masterKey = await createMasterKey(password, salt);
-        
-        // Fetch user data
         const userData = await retriveUserInfo(result.id);
-        
-        // Update user context
-        if (setUserName) setUserName(email);
-        if (setUserKey) setUserKey(masterKey);
-        if (setuuID) setuuID(result.id);
-        
+        setUserName(userData?.name ?? email);
+        setuuID(result.id);
+        setOrganisationId(userData?.organisation_id ?? null);
+        setUserRole(userData?.role ?? 'Member');
+        const masterKey = await createMasterKey(password);
+        setUserKey(masterKey);
+
         await logEvent({
-          action:   LOG_ACTIONS.LOGIN_SUCCESS,
-          userId:   result.id ?? 'unknown',
-          userName: email,
-          target:   'Authentication',
-          details:  'User signed in successfully',
-          severity: SEVERITY.INFO,
+          action:         LOG_ACTIONS.LOGIN_SUCCESS,
+          userId:         result.id,
+          userName:       userData?.name ?? email,
+          organisationId: userData?.organisation_id ?? 0,
+          userRole:       userData?.role ?? 'Member',
+          target:         'Authentication',
+          details:        'User signed in successfully',
+          severity:       SEVERITY.INFO,
         });
-        
-        // Redirect to vault
-        window.location.href = '/vault';
+
+        navigate('/vault');
       } else {
-        setError('Invalid email or password');
         await logEvent({
           action:   LOG_ACTIONS.LOGIN_FAILED,
           userId:   'anonymous',
@@ -53,18 +47,15 @@ const SignIn = () => {
           severity: SEVERITY.WARN,
         });
       }
-    } catch (err) {
-      setError('Login failed. Please try again.');
+    } catch {
       await logEvent({
         action:   LOG_ACTIONS.LOGIN_FAILED,
         userId:   'anonymous',
         userName: email,
         target:   'Authentication',
-        details:  'Login request error: ' + (err?.message || 'Unknown error'),
+        details:  'Login request error',
         severity: SEVERITY.WARN,
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -123,18 +114,11 @@ const SignIn = () => {
               </div>
             </div>
 
-            {error && (
-              <div className="bg-red-900/30 border border-red-700/50 rounded-xl p-3 text-sm text-red-200">
-                {error}
-              </div>
-            )}
-
             <button 
               type="submit" 
-              disabled={loading}
-              className="w-full bg-white text-black py-4 rounded-xl font-bold hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 group"
+              className="w-full bg-white text-black py-4 rounded-xl font-bold hover:bg-slate-200 transition-all flex items-center justify-center gap-2 group"
             >
-              {loading ? 'Signing In...' : 'Sign In'} <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              Sign In <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </form>
 
