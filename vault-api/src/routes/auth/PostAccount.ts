@@ -1,4 +1,4 @@
-import { Type } from "@sinclair/typebox";
+/*import { Type } from "@sinclair/typebox";
 import { OpenAPIRoute } from "chanfana";
 import { prismaClient } from "../../db/client.js";
 import type { AppContext } from "../../index.js";
@@ -85,4 +85,4 @@ export class PostAccount extends OpenAPIRoute {
       return c.json({ confirm: false, error: "Database error during provisioning." }, 500);
     }
   }
-}
+}*/

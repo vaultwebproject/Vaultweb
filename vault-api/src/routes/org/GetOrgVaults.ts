@@ -19,12 +19,8 @@ export class GetOrgVaults extends OpenAPIRoute {
 
     const vaults = await prisma.vault.findMany({
       where: {
-        userVaults: {
-          some: {
-            user: {
-              orgId: data.params.orgId,
-            },
-          },
+        department: {
+          orgId: data.params.orgId,
         },
       },
       select: {

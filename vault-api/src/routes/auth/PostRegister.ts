@@ -2,7 +2,7 @@ import { OpenAPIRoute } from "chanfana";
 import { z } from "zod";
 import { prismaClient } from "../../db/client.js";
 import type { AppContext } from "../../index.js";
-import { UserRole } from "../../generated/prisma/client.js";
+import { UserRole } from "../../generated/client.js";
 
 export class PostRegister extends OpenAPIRoute {
   schema = {
@@ -50,7 +50,7 @@ export class PostRegister extends OpenAPIRoute {
       data: {
         email,
         passwordHash: passHash,
-        role: "ORG_USER",
+        role: UserRole.ORG_USER,
         orgId: org.id,
       },
     });

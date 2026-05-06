@@ -29,7 +29,7 @@ const SignIn = () => {
         const key = await createMasterKey(email, password);
         userInfo.setUserKey(key);
         localStorage.setItem('vault_user_id', user.id);
-        navigate('/vault');
+        navigate('/admin');
       }
     }
   };

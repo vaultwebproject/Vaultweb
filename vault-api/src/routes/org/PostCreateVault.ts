@@ -2,7 +2,7 @@ import { OpenAPIRoute } from "chanfana";
 import { z } from "zod";
 import { prismaClient } from "../../db/client.js";
 import type { AppContext } from "../../index.js";
-import type { Prisma } from "../../generated/prisma/client.js";
+import type { Prisma } from "../../generated/client.js";
 
 export class PostCreateVault extends OpenAPIRoute {
   schema = {
@@ -18,6 +18,7 @@ export class PostCreateVault extends OpenAPIRoute {
               name: z.string().min(1),
               ownerUserId: z.uuidv7(),
               wrappedKey: z.string().min(1),
+              departmentId: z.uuidv7(),
             }),
           },
         },
@@ -30,7 +31,7 @@ export class PostCreateVault extends OpenAPIRoute {
     const prisma = prismaClient(c);
 
     const { orgId } = data.params;
-    const { name, ownerUserId, wrappedKey } = data.body;
+    const { name, ownerUserId, wrappedKey, departmentId } = data.body;
 
     const owner = await prisma.user.findFirst({
       where: {
@@ -47,6 +48,7 @@ export class PostCreateVault extends OpenAPIRoute {
       const vault = await tx.vault.create({
         data: {
           name,
+          departmentId,
         },
       });
 

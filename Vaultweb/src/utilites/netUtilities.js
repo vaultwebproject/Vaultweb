@@ -98,12 +98,14 @@ export const retrieveOrgVaults = async (orgId) => {
     }
 };
 // create a new vault inside an organisation
-export const createVault = async (orgId, name, ownerUserId, wrappedKey) => {
+export const createVault = async (orgId, name, ownerUserId, wrappedKey, departmentId) => {
     try {
         const res = await axios.post(`http://localhost:3000/org/${orgId}/vaults`, {
             name,
             ownerUserId,
-            wrappedKey
+            wrappedKey,
+            departmentId
+
         });
         return res.data;
     } catch (err) {
