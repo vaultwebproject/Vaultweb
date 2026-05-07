@@ -1,9 +1,16 @@
 
+enum ItemStatus {
+    ACTIVE
+    ARCHIVED
+}
+
 model Item {
-    id             String   @id @unique @default(uuid(7))
+    id             String     @id @unique @default(uuid(7))
     name           String
-    submissionData String // IV + Secret
+    submissionData String
     vaultId        String
-    vault          Vault    @relation(fields: [vaultId], references: [id], onDelete: Cascade)
-    updatedAt      DateTime @updatedAt
+    vault          Vault      @relation(fields: [vaultId], references: [id])
+    status         ItemStatus @default(ACTIVE)
+    updatedAt      DateTime   @updatedAt
+    createdAt      DateTime   @default(now())
 }

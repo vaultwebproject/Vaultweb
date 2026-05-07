@@ -7,19 +7,22 @@ enum VaultRole {
     VIEWER
 }
 
+enum AccessStatus {
+    ACTIVE
+    REVOKED
+}
+
 model UserVault {
-    id      String @id @unique @default(uuid(7))
-    userId  String
-    vaultId String
-    user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    vault   Vault  @relation(fields: [vaultId], references: [id], onDelete: Cascade)
-
-    // Permissions
-    vaultRole  VaultRole @default(VIEWER)
-
-    wrappedKey String
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
+    id           String       @id @unique @default(uuid(7))
+    userId       String
+    vaultId      String
+    user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    vault        Vault        @relation(fields: [vaultId], references: [id])
+    vaultRole    VaultRole    @default(VIEWER)
+    accessStatus AccessStatus @default(ACTIVE)
+    wrappedKey   String
+    createdAt    DateTime     @default(now())
+    updatedAt    DateTime     @updatedAt
 
     @@unique([userId, vaultId])
 }
