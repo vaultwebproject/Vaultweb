@@ -115,231 +115,202 @@ const Admin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-[Poppins] pt-24 pb-12 px-6">
+    /* Amy's Fix: Deep Navy Background to match Organization Page */
+    <div className="min-h-screen bg-transparent text-slate-200 font-[Poppins] pt-24 pb-12 px-6 relative z-10">
       <div className="max-w-7xl mx-auto">
         
+        {/* --- HEADER --- */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
           <div>
-            <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
-              <ShieldCheck className="text-purple-500" /> Organization Admin
+            <h1 className="text-4xl font-black text-white tracking-tighter flex items-center gap-3">
+              <ShieldCheck className="text-sky-400" size={36} /> Admin Control
             </h1>
-            <p className="text-slate-400 mt-1">
-              Manage infrastructure access and monitor security compliance.
+            <p className="text-sky-200/60 mt-1 font-medium">
+              Infrastructure Governance & RBAC Management
             </p>
           </div>
-          <button className="flex items-center gap-2 bg-white text-black px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-200 transition-all">
-            <UserPlus size={18} /> Add Member
+          <button className="flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-white px-6 py-3 rounded-2xl font-bold text-sm transition-all shadow-lg shadow-sky-500/20 active:scale-95">
+            <UserPlus size={18} /> Provision Member
           </button>
         </div>
 
-        <div className="flex gap-8 border-b border-white/5 mb-8">
-          <button 
-            onClick={() => setActiveTab('users')}
-            className={`pb-4 text-sm font-bold tracking-widest uppercase transition-all ${activeTab === 'users' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-slate-500 hover:text-slate-300'}`}
-          >
-            Team Management
-          </button>
-
-          {/* added a new Vault Management tab for organisation vault actions */}
-          <button 
-            onClick={() => setActiveTab('vaults')}
-            className={`pb-4 text-sm font-bold tracking-widest uppercase transition-all ${activeTab === 'vaults' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-slate-500 hover:text-slate-300'}`}
-          >
-            Vault Management
-          </button>
-
-          <button 
-            onClick={() => setActiveTab('logs')}
-            className={`pb-4 text-sm font-bold tracking-widest uppercase transition-all ${activeTab === 'logs' ? 'text-purple-400 border-b-2 border-purple-400' : 'text-slate-500 hover:text-slate-300'}`}
-          >
-            Security Audit
-          </button>
+        {/* --- TABS --- */}
+        <div className="flex gap-8 border-b border-white/10 mb-8">
+          {['users', 'vaults', 'logs'].map((tab) => (
+            <button 
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`pb-4 text-xs font-black uppercase tracking-[0.2em] transition-all ${
+                activeTab === tab 
+                ? 'text-sky-400 border-b-2 border-sky-400' 
+                : 'text-slate-400 hover:text-sky-200'
+              }`}
+            >
+              {tab === 'users' ? 'Team Management' : tab === 'vaults' ? 'Vault Control' : 'Security Audit'}
+            </button>
+          ))}
         </div>
 
-        <div className="bg-slate-900/40 border border-white/5 rounded-3xl backdrop-blur-xl overflow-hidden shadow-2xl">
+        {/* --- MAIN CONTENT CARD --- */}
+        <div className="bg-white/5 border border-white/10 rounded-[2.5rem] backdrop-blur-2xl overflow-hidden shadow-2xl">
           
-          {/* added loading check before showing page content */}
           {loading ? (
-            <div className="p-8 text-slate-400">Loading organisation data...</div>
+            <div className="p-20 flex flex-col items-center justify-center text-sky-400">
+              <Loader2 className="animate-spin mb-4" size={40} />
+              <p className="text-[10px] font-black uppercase tracking-widest">Syncing Org Data...</p>
+            </div>
 
           ) : activeTab === 'users' ? (
-            <div className="animate-in fade-in duration-500">
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-white/[0.02] border-b border-white/5">
-                    <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Member</th>
-                    <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Access Level</th>
-                    <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
-                    <th className="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Settings</th>
+                  <tr className="bg-white/5 border-b border-white/10">
+                    <th className="px-8 py-5 text-[10px] font-black text-sky-200/40 uppercase tracking-[0.2em]">Identity</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-sky-200/40 uppercase tracking-[0.2em]">Privileges</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-sky-200/40 uppercase tracking-[0.2em]">Connection</th>
+                    <th className="px-8 py-5 text-right"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {/* users are now loaded from backend state instead of hardcoded array */}
                   {users.length > 0 ? users.map((user) => (
-                    <tr key={user.id} className="hover:bg-white/[0.01] transition-colors">
+                    <tr key={user.id} className="hover:bg-white/5 transition-colors group">
                       <td className="px-8 py-6">
-                        <div className="font-bold text-white">{user.name || user.email}</div>
-                        <div className="text-xs text-slate-500 font-mono">{user.email}</div>
+                        <div className="font-bold text-white group-hover:text-sky-300 transition-colors">{user.name || user.email}</div>
+                        <div className="text-[11px] text-slate-500 font-mono mt-0.5">{user.email}</div>
                       </td>
                       <td className="px-8 py-6">
-                        <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter bg-slate-800 text-slate-400">
+                        <span className="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-sky-500/10 text-sky-400 border border-sky-500/20">
                           {user.role}
                         </span>
                       </td>
-                      <td className="px-8 py-6 text-sm font-medium">
+                      <td className="px-8 py-6 text-xs font-bold text-slate-300">
                         <div className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                           {user.status || "Active"}
                         </div>
                       </td>
                       <td className="px-8 py-6 text-right">
-                        <button className="p-2 hover:bg-white/5 rounded-lg text-slate-500 hover:text-white transition-all">
+                        <button className="p-2 hover:bg-sky-500/20 rounded-xl text-slate-400 hover:text-sky-300 transition-all">
                           <MoreVertical size={18} />
                         </button>
                       </td>
                     </tr>
                   )) : (
-                    // added empty-state fallback
-                    <tr>
-                      <td colSpan="4" className="px-8 py-8 text-slate-500 text-center">
-                        No organisation users available.
-                      </td>
-                    </tr>
+                    <tr><td colSpan="4" className="px-8 py-20 text-center text-slate-500 italic">No network identities found.</td></tr>
                   )}
                 </tbody>
               </table>
             </div>
 
           ) : activeTab === 'vaults' ? (
-            // added Vault Management tab content
-            <div className="animate-in fade-in duration-500 p-8 space-y-8">
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 p-10 space-y-10">
 
-              {/* Create Vault section */}
-              <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-6">
-                <h2 className="text-lg font-bold text-white mb-4">Create Vault</h2>
-                <div className="flex gap-3">
+              {/* Create Vault */}
+              <div className="bg-sky-500/5 border border-sky-500/10 rounded-3xl p-8">
+                <h2 className="text-sm font-black text-sky-400 uppercase tracking-widest mb-6">Initialize New Vault</h2>
+                <div className="flex gap-4">
                   <input
                     type="text"
                     value={newVaultName}
                     onChange={(e) => setNewVaultName(e.target.value)}
-                    placeholder="Enter vault name"
-                    className="flex-1 bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white outline-none"
+                    placeholder="e.g. Finance-Internal-S3"
+                    className="flex-1 bg-slate-900/50 border border-white/10 rounded-2xl px-5 py-4 text-white outline-none focus:border-sky-500/50 transition-all"
                   />
                   <button
                     onClick={handleCreateVault}
-                    className="bg-purple-600 hover:bg-purple-700 px-5 py-3 rounded-xl text-white font-bold"
+                    className="bg-sky-500 hover:bg-sky-400 px-8 py-4 rounded-2xl text-white font-bold transition-all shadow-lg shadow-sky-500/20 active:scale-95"
                   >
-                    Create
+                    Provision
                   </button>
                 </div>
               </div>
 
-              {/* Add User To Vault section */}
-              <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-6">
-                <h2 className="text-lg font-bold text-white mb-4">Add User To Vault</h2>
-                <div className="grid md:grid-cols-3 gap-3">
+              {/* Assign User */}
+              <div className="bg-white/5 border border-white/10 rounded-3xl p-8">
+                <h2 className="text-sm font-black text-white uppercase tracking-widest mb-6">Access Granting</h2>
+                <div className="grid md:grid-cols-3 gap-4">
                   <select
                     value={selectedUserId}
                     onChange={(e) => setSelectedUserId(e.target.value)}
-                    className="bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white"
+                    className="bg-slate-900 border border-white/10 rounded-2xl px-4 py-4 text-white"
                   >
-                    <option value="">Select User</option>
-                    {users.map((user) => (
-                      <option key={user.id} value={user.id}>
-                        {user.name || user.email}
-                      </option>
-                    ))}
+                    <option value="">Target Identity</option>
+                    {users.map((user) => <option key={user.id} value={user.id}>{user.name || user.email}</option>)}
                   </select>
-
                   <select
                     value={selectedVaultId}
                     onChange={(e) => setSelectedVaultId(e.target.value)}
-                    className="bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white"
+                    className="bg-slate-900 border border-white/10 rounded-2xl px-4 py-4 text-white"
                   >
-                    <option value="">Select Vault</option>
-                    {vaults.map((vault) => (
-                      <option key={vault.id} value={vault.id}>
-                        {vault.name}
-                      </option>
-                    ))}
+                    <option value="">Target Vault</option>
+                    {vaults.map((vault) => <option key={vault.id} value={vault.id}>{vault.name}</option>)}
                   </select>
-
                   <button
                     onClick={handleAddUserToVault}
-                    className="bg-green-600 hover:bg-green-700 px-5 py-3 rounded-xl text-white font-bold"
+                    className="bg-emerald-600 hover:bg-emerald-500 px-5 py-4 rounded-2xl text-white font-bold transition-all active:scale-95"
                   >
-                    Assign
+                    Grant Access
                   </button>
                 </div>
               </div>
 
-              {/* Vault list section with deactivate and remove-access actions */}
-              <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-6">
-                <h2 className="text-lg font-bold text-white mb-4">Vault List</h2>
-                <div className="space-y-4">
+              {/* Vault List */}
+              <div className="space-y-6">
+                <h2 className="text-sm font-black text-white uppercase tracking-widest px-2">Active Infrastructure</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {vaults.length > 0 ? vaults.map((vault) => (
-                    <div key={vault.id} className="bg-slate-950 border border-white/5 rounded-xl p-4">
-                      <div className="flex items-center justify-between gap-4">
+                    <div key={vault.id} className="bg-white/5 border border-white/5 rounded-3xl p-6 hover:border-sky-500/30 transition-all">
+                      <div className="flex items-center justify-between mb-6">
                         <div>
-                          <div className="font-bold text-white">{vault.name}</div>
-                          <div className="text-xs text-slate-500">
-                            Users Assigned: {vault.users?.length || 0}
+                          <div className="font-black text-lg text-white">{vault.name}</div>
+                          <div className="text-[10px] font-bold text-sky-400 uppercase tracking-widest mt-1">
+                            {vault.users?.length || 0} Authorized Users
                           </div>
                         </div>
-                        <button
-                          onClick={() => handleDeactivateVault(vault.id)}
-                          className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-white text-sm font-bold"
-                        >
+                        <button onClick={() => handleDeactivateVault(vault.id)} className="p-2 text-red-400 hover:bg-red-400/10 rounded-xl transition-all">
                           Deactivate
                         </button>
                       </div>
 
-                      {vault.users?.length > 0 && (
-                        <div className="mt-4 space-y-2">
-                          {vault.users.map((user) => (
-                            <div key={user.id} className="flex items-center justify-between text-sm text-slate-300 bg-white/[0.02] rounded-lg px-3 py-2">
-                              <span>{user.name || user.email}</span>
-                              <button
-                                onClick={() => handleRemoveUserVaultAccess(user.id, vault.id)}
-                                className="text-red-400 hover:text-red-300"
-                              >
-                                Remove Access
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        {vault.users?.map((user) => (
+                          <div key={user.id} className="flex items-center justify-between text-xs bg-white/5 rounded-xl px-4 py-3 border border-white/5">
+                            <span className="font-medium text-slate-300">{user.name || user.email}</span>
+                            <button onClick={() => handleRemoveUserVaultAccess(user.id, vault.id)} className="text-red-400/60 hover:text-red-400 font-bold uppercase text-[9px] tracking-widest">
+                              Revoke
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  )) : (
-                    <div className="text-slate-500">No vaults available.</div>
-                  )}
+                  )) : <div className="text-slate-500 p-4">No active vaults discovered.</div>}
                 </div>
               </div>
             </div>
 
           ) : (
-            <div className="animate-in fade-in duration-500">
-              <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
-                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                  <Activity size={14} className="text-purple-500" /> System Logs (Last 24h)
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <div className="p-8 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <div className="text-[10px] font-black text-sky-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Activity size={16} /> Forensic Audit Logs (24H)
                 </div>
-                <button className="text-[10px] text-purple-400 font-bold uppercase hover:underline">Export CSV</button>
+                <button className="text-[10px] text-sky-400 font-black uppercase hover:underline tracking-widest">Export Dataset</button>
               </div>
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-white/5 p-4">
                 {logs.map((log) => (
-                  <div key={log.id} className="px-8 py-5 flex items-center justify-between hover:bg-white/[0.01] transition-colors">
-                    <div className="flex items-center gap-4">
-                      <div className="w-8 h-8 rounded-lg bg-slate-950 border border-white/5 flex items-center justify-center text-slate-500">
-                        <FileText size={16} />
+                  <div key={log.id} className="px-6 py-5 flex items-center justify-between hover:bg-white/5 rounded-2xl transition-colors">
+                    <div className="flex items-center gap-5">
+                      <div className="w-10 h-10 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center text-sky-500 shadow-inner">
+                        <FileText size={18} />
                       </div>
                       <div>
                         <div className="text-sm font-bold text-white">{log.action}</div>
-                        <div className="text-xs text-slate-500">
-                          User: <span className="text-slate-300">{log.user}</span> • Target: <span className="text-slate-300">{log.target}</span>
+                        <div className="text-[11px] text-slate-500 mt-0.5 font-medium uppercase tracking-wider">
+                          Subject: <span className="text-sky-300">{log.user}</span> • Object: <span className="text-sky-300">{log.target}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="text-[11px] font-mono text-slate-600 uppercase">{log.time}</div>
+                    <div className="text-[10px] font-mono text-slate-600 bg-black/20 px-3 py-1 rounded-lg border border-white/5">{log.time}</div>
                   </div>
                 ))}
               </div>
