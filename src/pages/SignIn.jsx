@@ -22,7 +22,8 @@ const SignIn = () => {
         setuuID(result.id);
         setOrganisationId(userData?.organisation_id ?? null);
         setUserRole(userData?.role ?? 'Member');
-        const masterKey = await createMasterKey(password);
+        const salt = new TextEncoder().encode(email);
+        const masterKey = await createMasterKey(password, salt);
         setUserKey(masterKey);
 
         await logEvent({
@@ -40,7 +41,7 @@ const SignIn = () => {
       } else {
         await logEvent({
           action:   LOG_ACTIONS.LOGIN_FAILED,
-          userId:   'anonymous',
+          userId:   0,
           userName: email,
           target:   'Authentication',
           details:  'Invalid credentials',
@@ -50,7 +51,7 @@ const SignIn = () => {
     } catch {
       await logEvent({
         action:   LOG_ACTIONS.LOGIN_FAILED,
-        userId:   'anonymous',
+        userId:   0,
         userName: email,
         target:   'Authentication',
         details:  'Login request error',

@@ -28,15 +28,14 @@ export const submitLogin = async (email, password) => {
     }
 };
 
-export const submitSecret = async (key, data, userID, name, iv) => {
-    var submissionData = "";
-    submissionData, iv = encryptData(data, key);
+export const submitSecret = async (key, data, userID, name) => {
+    const { cipherText, iv } = await encryptData(data, key);
 
     const submission = new FormData();
     submission.append("userID", userID);
     submission.append("name", name);
-    submission.append("submissionData", submissionData);
-    submission.append("iv", iv);
+    submission.append("submissionData", JSON.stringify(Array.from(new Uint8Array(cipherText))));
+    submission.append("iv", JSON.stringify(Array.from(iv)));
 
     try {
         const result = await axios.post(`${API_BASE}/data/submit`, submission);

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Building2,
   Key,
@@ -7,7 +8,20 @@ import {
   Download,
 } from "lucide-react";
 import { submitOrganisation } from "../utilites/netUtilities";
+import { createKeyPair } from "../utilites/cryptoUtilities";
 import { logEvent, LOG_ACTIONS, SEVERITY, TARGET_TYPES } from "../utilites/auditLogger";
+
+const bufferToBase64 = (buffer) => {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+  return window.btoa(binary);
+};
+
+const toPem = (base64, type) => {
+  const lines = base64.match(/.{1,64}/g).join('\n');
+  return `-----BEGIN ${type}-----\n${lines}\n-----END ${type}-----`;
+};
 
 const CreateOrganisation = () => {
   const [step, setStep] = useState(1);
@@ -15,6 +29,8 @@ const CreateOrganisation = () => {
   const [orgName, setOrgName] = useState("");
   const [adminEmail, setAdminEmail] = useState("");
   const [createdOrg, setCreatedOrg] = useState(null);
+  const [exportedKeys, setExportedKeys] = useState({ publicPem: '', privatePem: '' });
+  const navigate = useNavigate();
 
   const handleCreateOrg = async () => {
     const result = await submitOrganisation(orgName, adminEmail);
@@ -33,12 +49,25 @@ const CreateOrganisation = () => {
     setStep(2);
   };
 
-  const handleGenerateKeys = () => {
+  const handleGenerateKeys = async () => {
     setIsGenerating(true);
-    setTimeout(() => {
-      setIsGenerating(false);
-      setStep(3);
-    }, 3000);
+    try {
+      const keyPair = await createKeyPair();
+
+      const [pubBuffer, privBuffer] = await Promise.all([
+        window.crypto.subtle.exportKey('spki',  keyPair.publicKey),
+        window.crypto.subtle.exportKey('pkcs8', keyPair.privateKey),
+      ]);
+
+      setExportedKeys({
+        publicPem:  toPem(bufferToBase64(pubBuffer),  'PUBLIC KEY'),
+        privatePem: toPem(bufferToBase64(privBuffer), 'PRIVATE KEY'),
+      });
+    } catch (err) {
+      console.error('Key generation failed:', err.message);
+    }
+    setIsGenerating(false);
+    setStep(3);
   };
 
   return (
@@ -162,11 +191,48 @@ const CreateOrganisation = () => {
             </h2>
 
             <div className="space-y-4">
-              <button className="w-full flex items-center justify-between bg-slate-950 border border-white/10 p-4 rounded-xl group hover:border-purple-500/50 transition-colors">
+              <button
+                onClick={() => {
+                  const content = [
+                    '================================================================',
+                    '  VaultWeb Emergency Recovery Kit',
+                    '================================================================',
+                    '',
+                    `Organisation : ${orgName}`,
+                    `Admin Email  : ${adminEmail}`,
+                    `Org ID       : ${createdOrg?.organisation_id ?? 'N/A'}`,
+                    `Generated    : ${new Date().toISOString()}`,
+                    '',
+                    'WARNING: Store this file in a secure offline location.',
+                    'VaultWeb does not retain copies of your private key.',
+                    '',
+                    '----------------------------------------------------------------',
+                    '  PUBLIC KEY (RSA-4096 / SPKI)',
+                    '----------------------------------------------------------------',
+                    exportedKeys.publicPem,
+                    '',
+                    '----------------------------------------------------------------',
+                    '  PRIVATE KEY (RSA-4096 / PKCS8)  — KEEP THIS SECRET',
+                    '----------------------------------------------------------------',
+                    exportedKeys.privatePem,
+                    '',
+                    '================================================================',
+                  ].join('\n');
+
+                  const blob = new Blob([content], { type: 'text/plain' });
+                  const url  = URL.createObjectURL(blob);
+                  const a    = document.createElement('a');
+                  a.href     = url;
+                  a.download = `vaultweb-recovery-${orgName.replace(/\s+/g, '-')}.txt`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="w-full flex items-center justify-between bg-slate-950 border border-white/10 p-4 rounded-xl group hover:border-purple-500/50 transition-colors"
+              >
                 <div className="flex items-center gap-3">
                   <Download size={20} className="text-purple-400" />
                   <span className="text-sm font-medium">
-                    Download Emergency PDF
+                    Download Emergency Kit
                   </span>
                 </div>
                 <span className="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-1 rounded font-bold uppercase">
@@ -174,7 +240,10 @@ const CreateOrganisation = () => {
                 </span>
               </button>
 
-              <button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-xl font-bold shadow-xl shadow-purple-900/20 hover:opacity-90 transition-opacity">
+              <button
+                onClick={() => navigate('/signin')}
+                className="w-full bg-linear-to-r from-purple-600 to-blue-600 text-white py-4 rounded-xl font-bold shadow-xl shadow-purple-900/20 hover:opacity-90 transition-opacity"
+              >
                 Finalize & Enter Vault
               </button>
             </div>

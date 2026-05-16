@@ -18,9 +18,8 @@ const Upload = () => {
     e.preventDefault();
     try {
       setStatus('encrypting');
-      const iv = crypto.randomUUID();
       setStatus('uploading');
-      await submitSecret(userKey, formData.value, userId, formData.name, iv);
+      await submitSecret(userKey, formData.value, userId, formData.name);
       await logEvent({
         action:         LOG_ACTIONS.SECRET_CREATED,
         userId,
@@ -66,7 +65,7 @@ const Upload = () => {
         </div>
 
         {/* Upload Form */}
-        <form onSubmit={handleSubmit} className="bg-slate-900/40 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-2xl space-y-6">
+        <form onSubmit={handleSubmit} className="relative bg-slate-900/40 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-2xl space-y-6">
           
           {/* Status Overlay */}
           {status !== 'idle' && (
@@ -106,7 +105,11 @@ const Upload = () => {
 
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Category</label>
-            <select className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500/50 outline-none transition-all appearance-none">
+            <select
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500/50 outline-none transition-all appearance-none"
+            >
               <option>Infrastructure</option>
               <option>Finance</option>
               <option>Internal Keys</option>
