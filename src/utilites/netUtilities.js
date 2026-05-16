@@ -5,16 +5,12 @@ import { sha1, sha256, sha384, sha512 } from 'crypto-hash';
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
 
 export const submitAccount = async (email, role, organisation) => {
-    const submission = new FormData();
-    submission.append("email", email);
-    submission.append("role", role);
-    submission.append("organisation", organisation);
-
     try {
-        const result = await axios.post(`${API_BASE}/createAccount`, submission);
+        const result = await axios.post(`${API_BASE}/createAccount`, { email, role, organisation });
         return result;
     } catch (err) {
         console.error("Post failed");
+        throw err;
     }
 };
 
@@ -30,18 +26,17 @@ export const submitLogin = async (email, password) => {
 
 export const submitSecret = async (key, data, userID, name) => {
     const { cipherText, iv } = await encryptData(data, key);
-
-    const submission = new FormData();
-    submission.append("userID", userID);
-    submission.append("name", name);
-    submission.append("submissionData", JSON.stringify(Array.from(new Uint8Array(cipherText))));
-    submission.append("iv", JSON.stringify(Array.from(iv)));
-
     try {
-        const result = await axios.post(`${API_BASE}/data/submit`, submission);
+        const result = await axios.post(`${API_BASE}/data/submit`, {
+            userID,
+            name,
+            submissionData: JSON.stringify(Array.from(new Uint8Array(cipherText))),
+            iv:             JSON.stringify(Array.from(iv)),
+        });
         return result;
     } catch (err) {
-        console.error("Post failed");
+        console.error("Post failed:", err.message);
+        throw err;
     }
 };
 
