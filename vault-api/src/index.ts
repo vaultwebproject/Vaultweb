@@ -1,30 +1,41 @@
 import { serve } from "@hono/node-server";
 import { Hono, type Context } from "hono";
 import { cors } from "hono/cors";
-import { PrismaClient } from "./generated/prisma/client.js";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { fromHono } from "chanfana";
+import { authMiddleware } from "./middleware/auth.js";
 import { GetVaultById } from "./routes/vault/GetVaultById.js";
 import { PostLogin } from "./routes/auth/PostLogin.js";
 import { PostRegister } from "./routes/auth/PostRegister.js";
 import { GetUserById } from "./routes/users/GetUserById.js";
 
-const app = new Hono();
-
-app.use(cors({ origin: "http://localhost:5173" })); // Enable CORS for requests from the frontend running on localhost:5173
-
 export type Env = {};
-export type AppContext = Context<{ Bindings: Env }>;
+export type Variables = { userId: string; role: string };
+
+const app = new Hono<{ Variables: Variables }>();
+
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
+
+export type AppContext = Context<{ Bindings: Env; Variables: Variables }>;
 
 app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
 
+// Protected routes — JWT required
+app.use("/org/*", authMiddleware);
+app.use("/users/*", authMiddleware);
+
 const openapi = fromHono(app);
 
-openapi.get("/org/:orgId/vaults/:vaultId", GetVaultById);
+// Public
 openapi.post("/auth/login", PostLogin);
-openapi.post("/createAccount", PostRegister); // PostLogin route to the OpenAPI router
+openapi.post("/createAccount", PostRegister);
+
+// Protected
+openapi.get("/org/:orgId/vaults/:vaultId", GetVaultById);
 openapi.get("/users/:userId", GetUserById);
 
 serve(

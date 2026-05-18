@@ -1,5 +1,7 @@
 import { OpenAPIRoute } from "chanfana";
 import { z } from "zod";
+import { sign } from "hono/jwt";
+import { setCookie } from "hono/cookie";
 import { prismaClient } from "../../db/client.js";
 import type { AppContext } from "../../index.js";
 
@@ -43,6 +45,19 @@ export class PostLogin extends OpenAPIRoute {
     if (!user || user.passwordHash !== passHash) {
       return c.json({ confirm: false }, 401);
     }
+
+    const token = await sign(
+      { userId: user.id, role: user.role, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 },
+      process.env.JWT_SECRET!
+    );
+
+    setCookie(c, "token", token, {
+      httpOnly: true,
+      sameSite: "Strict",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+      secure: false, // set to true in production (HTTPS)
+    });
 
     return c.json({ confirm: true, id: user.id, encryptedPrivateKey: user.encryptedPrivateKey, salt: user.salt });
   }

@@ -1,6 +1,7 @@
-import React from 'react';
 import axios from 'axios';
-import { encryptData, decryptData, exportPublicKey, createKeyPair, generateSalt, encryptPrivateKey, decryptPrivateKey, createMasterKey } from './cryptoUtilities';
+import { encryptData, exportPublicKey, createKeyPair, generateSalt, encryptPrivateKey, decryptPrivateKey, createMasterKey } from './cryptoUtilities';
+
+axios.defaults.withCredentials = true;
 
 let sessionPrivateKey = null;
 export const getSessionPrivateKey = () => sessionPrivateKey;
