@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { Lock, Mail, ArrowRight, ShieldCheck, Building2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { submitAccount } from '../utilites/netUtilities';
+import { createKeyPair, createMasterKey } from '../utilites/cryptoUtilities';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState("");
   const [organisation, setOrganisation] = useState("");
+  const [masterKey, setMasterKey] = useState();
+  const [keyPair, setKeyPair] = useState();
   const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
@@ -15,10 +18,31 @@ const SignUp = () => {
     try {
       const result = await submitAccount(email, "", password, organisation);
       console.log("Account provisioned:", result);
+      setMasterKey(createMasterKey(password, email));
+      setKeyPair(createKeyPair());
       navigate("/signin");
     } catch (err) {
       console.error("Signup failed:", err);
     }
+  };
+
+  const downloadFile = ([data]) => {
+    const blob = new Blob([JSON.stringify(data)], 'text/json');
+    const a = document.createElement('a');
+    a.download = 'RecoveryDoc';
+    a.href = window.createObjectURL(blob);
+    const clickEvt = new MouseEvent('click', {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    })
+    a.dispatchEvent(clickEvt)
+    a.remove()
+  };
+
+  const exportRecoveryFile = e => {
+    data = [masterKey, keyPair];
+    downloadFile(data);
   };
 
   return (
