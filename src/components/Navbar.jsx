@@ -1,8 +1,31 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "../UserContext";
+import { logEvent, LOG_ACTIONS, SEVERITY } from "../utilites/auditLogger";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const ctx      = useContext(UserContext) ?? {};
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logEvent({
+      action:         LOG_ACTIONS.LOGOUT,
+      userId:         ctx.uuID           || 0,
+      userName:       ctx.userName       || 'Unknown',
+      organisationId: ctx.organisationId || 0,
+      userRole:       ctx.userRole       || 'Member',
+      target:         'Authentication',
+      details:        'User logged out',
+      severity:       SEVERITY.INFO,
+    });
+    ctx.setuuID?.('');
+    ctx.setUserName?.('');
+    ctx.setUserKey?.('');
+    ctx.setOrganisationId?.(null);
+    ctx.setUserRole?.('Member');
+    navigate('/signin');
+  };
 
   return (
     // Reduced height to h-20 for a cleaner look; h-30 was likely too tall.
@@ -52,11 +75,20 @@ const Navbar = () => {
 
         {/* 3. RIGHT SIDE: Actions & Toggle */}
         <div className="flex items-center space-x-5 z-50">
-            <Link to="signin">
-          <button className="hidden md:block text-xs font-bold text-gray-400 hover:text-white transition-colors uppercase tracking-widest">
-            Sign In
-          </button>
-          </Link>
+          {ctx.uuID ? (
+            <button
+              onClick={handleLogout}
+              className="hidden md:block text-xs font-bold text-gray-400 hover:text-white transition-colors uppercase tracking-widest"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link to="/signin">
+              <button className="hidden md:block text-xs font-bold text-gray-400 hover:text-white transition-colors uppercase tracking-widest">
+                Sign In
+              </button>
+            </Link>
+          )}
 
           <Link to="/upload">
             <button className="hidden md:block px-5 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-[11px] rounded-full font-black hover:shadow-[0_0_20px_rgba(147,51,234,0.3)] transition-all active:scale-95 uppercase">

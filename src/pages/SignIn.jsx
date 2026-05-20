@@ -1,22 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Lock, Mail, ArrowRight, ShieldCheck, Github } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createMasterKey } from '../utilites/cryptoUtilities';
 import { submitLogin, retriveUserInfo } from '../utilites/netUtilities';
-import { useContext } from 'react';
+import { logEvent, LOG_ACTIONS, SEVERITY } from '../utilites/auditLogger';
+import { UserContext } from '../UserContext';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState("");
+  const { setUserName, setuuID, setUserKey, setOrganisationId, setUserRole } = useContext(UserContext);
+  const navigate = useNavigate();
 
-  const handleSignIn = (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
-    // Logic: Trigger Auth0 Login or Custom Auth
-    console.log("Initiating secure session for:", email);
-    result = submitLogin(email, password);
-    if (result.confirm == true){
-      userData = retriveUserInfo(result.id);
-      
+    try {
+      const result = await submitLogin(email, password);
+      if (result?.confirm === true) {
+        const userData = await retriveUserInfo(result.id);
+        setUserName(userData?.name ?? email);
+        setuuID(result.id);
+        setOrganisationId(userData?.organisation_id ?? null);
+        setUserRole(userData?.role ?? 'Member');
+        const salt = new TextEncoder().encode(email);
+        const masterKey = await createMasterKey(password, salt);
+        setUserKey(masterKey);
+
+        await logEvent({
+          action:         LOG_ACTIONS.LOGIN_SUCCESS,
+          userId:         result.id,
+          userName:       userData?.name ?? email,
+          organisationId: userData?.organisation_id ?? 0,
+          userRole:       userData?.role ?? 'Member',
+          target:         'Authentication',
+          details:        'User signed in successfully',
+          severity:       SEVERITY.INFO,
+        });
+
+        navigate('/vault');
+      } else {
+        await logEvent({
+          action:   LOG_ACTIONS.LOGIN_FAILED,
+          userId:   0,
+          userName: email,
+          target:   'Authentication',
+          details:  'Invalid credentials',
+          severity: SEVERITY.WARN,
+        });
+      }
+    } catch {
+      await logEvent({
+        action:   LOG_ACTIONS.LOGIN_FAILED,
+        userId:   0,
+        userName: email,
+        target:   'Authentication',
+        details:  'Login request error',
+        severity: SEVERITY.WARN,
+      });
     }
   };
 
